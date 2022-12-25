@@ -1,6 +1,5 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-use anyhow::{Context, Result};
 use sqlx::{
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
     SqlitePool,
@@ -8,12 +7,14 @@ use sqlx::{
 
 use crate::CONFIG;
 
-pub async fn init() -> Result<SqlitePool> {
+pub mod settings;
+
+pub async fn init() -> SqlitePool {
     let config = CONFIG.read().await;
     let mut path = config.db_path.clone();
 
     if !path.is_absolute() && path.starts_with("~") {
-        let home = std::env::var("HOME").context("Cannot expand ~: $HOME is not set")?;
+        let home = std::env::var("HOME").expect("Cannot expand ~: $HOME is not set");
         path = PathBuf::from(home);
         path.push(config.db_path.strip_prefix("~").unwrap());
     }
@@ -24,9 +25,13 @@ pub async fn init() -> Result<SqlitePool> {
             .create_if_missing(true)
             .journal_mode(SqliteJournalMode::Wal),
     )
-    .await?;
+    .await
+    .expect("Failed to open database");
 
-    sqlx::migrate!("./migrations").run(&pool).await?;
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .expect("Failed to run migrations");
 
-    Ok(pool)
+    pool
 }
