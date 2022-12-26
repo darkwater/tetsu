@@ -23,7 +23,7 @@ pub async fn index(path: &Path) -> Result<()> {
     let mpb = MultiProgress::new();
     crate::PROGRESS_BAR.write().unwrap().replace(mpb.clone());
 
-    let (tx, rx) = mpsc::unbounded_channel();
+    let (tx, rx) = mpsc::channel(10);
     let anidb_task_handle = tokio::spawn(get_anidb_data_task(rx));
 
     let overall = mpb.add(ProgressBar::new(0));
@@ -94,6 +94,7 @@ pub async fn index(path: &Path) -> Result<()> {
         );
 
         tx.send(AnidbRequestHandoff { hash, file_path, pb })
+            .await
             .unwrap();
 
         overall.inc(1);
@@ -111,7 +112,7 @@ pub async fn index(path: &Path) -> Result<()> {
     Ok(())
 }
 
-async fn get_anidb_data_task(mut rx: mpsc::UnboundedReceiver<AnidbRequestHandoff>) {
+async fn get_anidb_data_task(mut rx: mpsc::Receiver<AnidbRequestHandoff>) {
     let mut errors = 0u32;
 
     while let Some(handoff) = rx.recv().await {
