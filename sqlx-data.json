@@ -1,0 +1,171 @@
+{
+  "db": "SQLite",
+  "0b0b29cc45987de08e7c8b10110dd95397fae3e2c8129bce946d90344c4cf04c": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 7
+      }
+    },
+    "query": "INSERT INTO files (fid, aid, eid, gid, size, ed2k, json)\n                    VALUES ($1, $2, $3, $4, $5, $6, $7)\n                    ON CONFLICT (fid) DO UPDATE SET\n                        aid = $2,\n                        eid = $3,\n                        gid = $4,\n                        size = $5,\n                        ed2k = $6,\n                        json = $7"
+  },
+  "1a7048d5cb7ae00e48739f8e075f79eff6d939523d14560e6c73a1c950e3dddd": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2"
+  },
+  "1cfe956620190e6662f2dfaddec81ff896a0e203116d54f7467a51cc74f935b6": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "INSERT INTO anime (aid, json)\n                    VALUES ($1, $2)\n                    ON CONFLICT (aid) DO UPDATE SET\n                        json = $2"
+  },
+  "2045d4e9cc39872ef0a4202b387a81afe3cedf14256878024f0a4703844b6232": {
+    "describe": {
+      "columns": [
+        {
+          "name": "value",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT value FROM settings WHERE key = $1"
+  },
+  "3310c56073e099a942bccccc76bf005d7bc0e2fa193c504ee8e4557aa13550f9": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 7
+      }
+    },
+    "query": "INSERT INTO indexed_files (path, filename, filesize, ed2k, fid, first_seen, last_updated) VALUES (?, ?, ?, ?, ?, ?, ?)"
+  },
+  "351fecd89e8bc8ac31d9df38c79ff94067b900dd2e135eb76097560f6f16bcb3": {
+    "describe": {
+      "columns": [
+        {
+          "name": "json",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "SELECT json FROM files WHERE size = $1 AND ed2k = $2"
+  },
+  "3f8da519814a3577fb24fe22463371f973c16f957316caf89f74bbffab3b0fc1": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "INSERT INTO episodes (eid, aid, json)\n                    VALUES ($1, $2, $3)\n                    ON CONFLICT (eid) DO UPDATE SET\n                        aid = $2,\n                        json = $3"
+  },
+  "6ecf27a1020c21f3eaf7b4fc6e904b2924c788316cb0be0ff500aa45fbe96ae6": {
+    "describe": {
+      "columns": [
+        {
+          "name": "path",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        true
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT path FROM indexed_files WHERE path = ?"
+  },
+  "952c16507bd88ec5e29d0210c60f09e79e60735ff66a4f65100a659463ef7781": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "INSERT INTO groups (gid, json)\n                    VALUES ($1, $2)\n                    ON CONFLICT (gid) DO UPDATE SET\n                        json = $2"
+  },
+  "980298dfd9973cca8ec1eb1a7b8d46ffcac25d3a09c962966ed2614469234712": {
+    "describe": {
+      "columns": [
+        {
+          "name": "json",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT json FROM groups WHERE gid = $1"
+  },
+  "c03f88f9e691e612ec6d03721992f92b8fff611990b7df10cd026d7896c28ebd": {
+    "describe": {
+      "columns": [
+        {
+          "name": "json",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT json FROM episodes WHERE eid = $1"
+  },
+  "e444bd7795b633ccf009575e6819626a77cc23de9d6d31bdec520120007ff71d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "json",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT json FROM anime WHERE aid = $1"
+  }
+}
