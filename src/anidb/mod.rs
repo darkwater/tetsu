@@ -1,10 +1,13 @@
 use anyhow::{Context, Result};
 
-use self::{models::File, session::Session};
+use self::{
+    records::{Anime, Episode, File},
+    session::Session,
+};
 use crate::db::settings;
 
 mod command_builder;
-mod models;
+pub mod records;
 mod response;
 mod session;
 
@@ -56,5 +59,47 @@ impl Anidb {
         }
 
         self.session().await?.file_by_ed2k(size, hash).await
+    }
+
+    pub async fn anime_by_aid(&mut self, aid: u32) -> Result<Option<Anime>> {
+        let cache = sqlx::query!("SELECT json FROM anime WHERE aid = $1", aid)
+            .fetch_optional(crate::DB.get().await)
+            .await?;
+
+        if let Some(anime) = cache {
+            return Ok(Some(
+                serde_json::from_str(&anime.json).context("Invalid record in database")?,
+            ));
+        }
+
+        self.session().await?.anime_by_aid(aid).await
+    }
+
+    pub async fn episode_by_eid(&mut self, eid: u32) -> Result<Option<Episode>> {
+        let cache = sqlx::query!("SELECT json FROM episodes WHERE eid = $1", eid)
+            .fetch_optional(crate::DB.get().await)
+            .await?;
+
+        if let Some(episode) = cache {
+            return Ok(Some(
+                serde_json::from_str(&episode.json).context("Invalid record in database")?,
+            ));
+        }
+
+        self.session().await?.episode_by_eid(eid).await
+    }
+
+    pub async fn group_by_gid(&mut self, gid: u32) -> Result<Option<records::Group>> {
+        let cache = sqlx::query!("SELECT json FROM groups WHERE gid = $1", gid)
+            .fetch_optional(crate::DB.get().await)
+            .await?;
+
+        if let Some(group) = cache {
+            return Ok(Some(
+                serde_json::from_str(&group.json).context("Invalid record in database")?,
+            ));
+        }
+
+        self.session().await?.group_by_gid(gid).await
     }
 }

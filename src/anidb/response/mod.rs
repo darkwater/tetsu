@@ -1,13 +1,12 @@
 use std::str::FromStr;
 
-use ::serde::Deserialize;
 use anyhow::Context;
 use num_traits::FromPrimitive;
 
 use self::codes::ResponseCode;
+use super::records::Record;
 
 pub mod codes;
-mod serde;
 
 pub struct Response {
     pub code: ResponseCode,
@@ -42,12 +41,14 @@ impl Response {
         self.message.split_once(' ').map(|p| p.0)
     }
 
-    pub fn records_as<'de, T: Deserialize<'de>>(
-        &'de self,
-    ) -> impl Iterator<Item = Result<T, self::serde::Error>> + 'de {
-        self.records
-            .iter()
-            .map(|record| self::serde::from_str(record))
+    pub fn records_as<T: Record>(&self) -> impl Iterator<Item = anyhow::Result<T>> + '_ {
+        self.records.iter().map(|record| {
+            T::parse(record).context(format!(
+                "Failed to parse record as {}: {}",
+                std::any::type_name::<T>(),
+                record
+            ))
+        })
     }
 }
 
