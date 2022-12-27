@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{Record, RecordSplit};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Serialize, Deserialize)]
 pub struct Episode {
     pub eid: u32,
     pub aid: u32,

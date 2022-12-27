@@ -1,5 +1,23 @@
 {
   "db": "SQLite",
+  "08b8742141210281cc91ecc3490e33b22c71e26c9992b17224f2821fe2fd6de4": {
+    "describe": {
+      "columns": [
+        {
+          "name": "json",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT json FROM anime"
+  },
   "0b0b29cc45987de08e7c8b10110dd95397fae3e2c8129bce946d90344c4cf04c": {
     "describe": {
       "columns": [],
@@ -132,6 +150,24 @@
     },
     "query": "SELECT json FROM groups WHERE gid = $1"
   },
+  "9a7a4f1efcdd11c42291295963d181dc0ab81248c8f29c4a4ddd544115129f2d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "json",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT json FROM episodes WHERE aid = ?"
+  },
   "c03f88f9e691e612ec6d03721992f92b8fff611990b7df10cd026d7896c28ebd": {
     "describe": {
       "columns": [
@@ -149,6 +185,30 @@
       }
     },
     "query": "SELECT json FROM episodes WHERE eid = $1"
+  },
+  "ddca3eb96a481e87c16fd24000924d6914a6a6b329ad7621736c378a8f4ade36": {
+    "describe": {
+      "columns": [
+        {
+          "name": "fjson",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "gjson",
+          "ordinal": 1,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT f.json as fjson, g.json as gjson FROM files f\n                INNER JOIN groups g ON f.gid = g.gid\n                WHERE f.eid = ?"
   },
   "e444bd7795b633ccf009575e6819626a77cc23de9d6d31bdec520120007ff71d": {
     "describe": {

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{Record, RecordSplit};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Serialize, Deserialize)]
 pub struct Group {
     pub gid: u32,
     pub rating: i32,

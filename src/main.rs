@@ -17,6 +17,7 @@ mod config;
 mod db;
 mod indexer;
 mod log_proxy;
+mod ui;
 
 #[derive(Parser)]
 #[clap(version, author, about)]
@@ -48,6 +49,6 @@ async fn main() -> Result<()> {
     } else if let Some(ref path) = ARGS.index {
         indexer::index(path).await
     } else {
-        Ok(())
+        ui::run().await
     }
 }
