@@ -1,7 +1,10 @@
 use std::{str::FromStr, time::Duration};
 
 use anyhow::{bail, Context, Result};
-use tokio::{net::UdpSocket, time::Instant};
+use tokio::{
+    net::UdpSocket,
+    time::{timeout_at, Instant},
+};
 
 use super::{
     command_builder::CommandBuilder,
@@ -64,17 +67,32 @@ impl Session {
     pub async fn request_inner(&mut self, cmd: &str) -> Result<Response> {
         tokio::time::sleep_until(self.next_call).await;
 
-        self.next_call = Instant::now() + Duration::from_secs(2);
-
-        for line in cmd.to_string().lines() {
-            log::trace!("-> {}", line);
-        }
-
-        self.socket.send(cmd.to_string().as_bytes()).await?;
-
         let mut buf = [0; 1400]; // 1400 is AniDB's default and maximum MTU
-        let read = self.socket.recv(&mut buf).await?;
-        let bytes = buf[..read].to_owned();
+
+        let mut retries = 3;
+
+        let bytes = loop {
+            self.next_call = Instant::now() + Duration::from_secs(2);
+
+            for line in cmd.to_string().lines() {
+                log::trace!("-> {}", line);
+            }
+
+            self.socket.send(cmd.as_bytes()).await?;
+
+            match timeout_at(self.next_call, self.socket.recv(&mut buf)).await {
+                Ok(Ok(read)) => break buf[..read].to_owned(),
+                Ok(Err(e)) => bail!("Failed to read response: {}", e),
+                Err(_) => {
+                    if retries == 0 {
+                        bail!("Timed out waiting for response");
+                    }
+
+                    retries -= 1;
+                }
+            }
+        };
+
         let s = String::from_utf8(bytes)?;
 
         for line in s.lines() {
