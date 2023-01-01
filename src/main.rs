@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::RwLock as StdRwLock};
 
 use anidb::Anidb;
 use anyhow::Result;
@@ -17,6 +17,7 @@ mod config;
 mod db;
 mod indexer;
 mod log_proxy;
+mod mpv;
 mod ui;
 
 #[derive(Parser)]
@@ -34,8 +35,7 @@ lazy_static! {
     static ref CONFIG: RwLock<Config> = RwLock::new(Config::read());
     static ref DB: AsyncOnce<SqlitePool> = AsyncOnce::new(db::init());
     static ref ANIDB: RwLock<Anidb> = RwLock::new(Anidb::new());
-    static ref PROGRESS_BAR: std::sync::RwLock<Option<indicatif::MultiProgress>> =
-        std::sync::RwLock::new(None);
+    static ref PROGRESS_BAR: StdRwLock<Option<indicatif::MultiProgress>> = StdRwLock::new(None);
 }
 
 #[tokio::main]

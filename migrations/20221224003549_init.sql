@@ -1,16 +1,16 @@
 CREATE TABLE IF NOT EXISTS anime (
-    aid     INTEGER PRIMARY KEY,
+    aid     INTEGER NOT NULL PRIMARY KEY,
     json    TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS episodes (
-    eid     INTEGER PRIMARY KEY,
+    eid     INTEGER NOT NULL PRIMARY KEY,
     aid     INTEGER NOT NULL,
     json    TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS files (
-    fid     INTEGER PRIMARY KEY,
+    fid     INTEGER NOT NULL PRIMARY KEY,
     aid     INTEGER NOT NULL,
     eid     INTEGER NOT NULL,
     gid     INTEGER NOT NULL,
@@ -20,12 +20,12 @@ CREATE TABLE IF NOT EXISTS files (
 );
 
 CREATE TABLE IF NOT EXISTS groups (
-    gid     INTEGER PRIMARY KEY,
+    gid     INTEGER NOT NULL PRIMARY KEY,
     json    TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS indexed_files (
-    path                TEXT PRIMARY KEY,
+    path                TEXT NOT NULL PRIMARY KEY,
     filename            TEXT NOT NULL,
     filesize            INTEGER NOT NULL,
     ed2k                TEXT NOT NULL,
@@ -37,6 +37,6 @@ CREATE TABLE IF NOT EXISTS indexed_files (
 );
 
 CREATE TABLE IF NOT EXISTS settings (
-    key                 TEXT PRIMARY KEY,
+    key                 TEXT NOT NULL PRIMARY KEY,
     value               TEXT NOT NULL
 );

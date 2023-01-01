@@ -66,6 +66,24 @@
     },
     "query": "SELECT value FROM settings WHERE key = $1"
   },
+  "31d38a12669be6b51f83f2e33515b77404707aed725c835ff5fb61a2ee778f25": {
+    "describe": {
+      "columns": [
+        {
+          "name": "path",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT path FROM indexed_files WHERE fid = ?"
+  },
   "3310c56073e099a942bccccc76bf005d7bc0e2fa193c504ee8e4557aa13550f9": {
     "describe": {
       "columns": [],
@@ -114,7 +132,7 @@
         }
       ],
       "nullable": [
-        true
+        false
       ],
       "parameters": {
         "Right": 1

@@ -6,32 +6,30 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow      = "1.0.68"
-async_once = "0.2.6"
-chrono = { version = "0.4.23", features = ["serde"] }
-clap        = { version = "4.0.32", features = [ "derive" ] }
-config      = "0.13.3"
-crossterm = { version = "0.25.0", features = ["event-stream"] }
-dialoguer = "0.10.2"
-env_logger = "0.10.0"
-indicatif   = { version = "0.17.2", features = [ "rayon", "tokio" ] }
-itertools = "0.10.5"
-lazy_static = "1.4.0"
-log = "0.4.17"
-md4         = "0.10.2"
-memmap      = "0.7.0"
-nom = "7.1.1"
-num = "0.4.0"
-num-derive = "0.3.3"
-num-traits = "0.2.15"
-paste = "1.0.11"
-rayon = "1.6.1"
-serde       = { version = "1.0.151", features = [ "derive" ] }
-serde_json = "1.0.91"
-serde_repr = "0.1.10"
-sqlx        = { version = "0.6.2", features = ["runtime-tokio-rustls", "sqlite", "offline"] }
-thiserror = "1.0.38"
-tokio       = { version = "1.23.0", features = ["rt-multi-thread", "macros", "signal"] }
-tokio-stream = "0.1.11"
-toml        = "0.5.10"
+anyhow        = "1.0.68"
+async_once    = "0.2.6"
+chrono        = { version = "0.4.23", features = [ "serde" ] }
+clap          = { version = "4.0.32", features = [ "derive" ] }
+crossterm     = { version = "0.25.0", features = [ "event-stream" ] }
+dialoguer     = "0.10.2"
+env_logger    = "0.10.0"
+futures       = "0.3.25"
+indicatif     = { version = "0.17.2", features = [ "rayon", "tokio" ] }
+itertools     = "0.10.5"
+lazy_static   = "1.4.0"
+log           = "0.4.17"
+md4           = "0.10.2"
+memmap        = "0.7.0"
+nom           = "7.1.1"
+num-derive    = "0.3.3"
+num-traits    = "0.2.15"
+paste         = "1.0.11"
+rayon         = "1.6.1"
+serde         = { version = "1.0.151", features = [ "derive" ] }
+serde_json    = { version = "1.0.91", features = [ "preserve_order" ] }
+sqlx          = { version = "0.6.2", features = [ "runtime-tokio-rustls", "sqlite", "offline" ] }
+thiserror     = "1.0.38"
+tokio         = { version = "1.23.0", features = [ "rt-multi-thread", "macros", "signal", "process" ] }
+tokio-stream  = "0.1.11"
+toml          = "0.5.10"
 unicode-width = "0.1.10"

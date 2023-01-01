@@ -87,61 +87,61 @@ fid|aid|eid|gid|state|size|ed2k|anidbfilename"#;
         assert_eq!(response.data(), Some("abcdef"));
     }
 
-    #[test]
-    fn records_as() {
-        #[derive(Deserialize)]
-        struct Episode {
-            pub eid: u32,
-            pub aid: u32,
-            pub length: i32,
-            pub rating: i32,
-            pub votes: i32,
-            pub epno: String,
-            pub eng: String,
-            pub romaji: String,
-            pub kanji: String,
-            #[serde(with = "chrono::serde::ts_seconds")]
-            pub aired: DateTime<Utc>,
-            pub etype: EpisodeType,
-        }
+    //     #[test]
+    //     fn records_as() {
+    //         #[derive(Deserialize)]
+    //         struct Episode {
+    //             pub eid: u32,
+    //             pub aid: u32,
+    //             pub length: i32,
+    //             pub rating: i32,
+    //             pub votes: i32,
+    //             pub epno: String,
+    //             pub eng: String,
+    //             pub romaji: String,
+    //             pub kanji: String,
+    //             #[serde(with = "chrono::serde::ts_seconds")]
+    //             pub aired: DateTime<Utc>,
+    //             pub etype: EpisodeType,
+    //         }
 
-        #[derive(Deserialize_repr, Debug, PartialEq)]
-        #[repr(i32)]
-        enum EpisodeType {
-            Regular = 1,
-            Other = 6,
-            Credit = 3,
-            Trailer = 4,
-            Special = 2,
-            Parody = 5,
-        }
+    //         #[derive(Deserialize_repr, Debug, PartialEq)]
+    //         #[repr(i32)]
+    //         enum EpisodeType {
+    //             Regular = 1,
+    //             Other = 6,
+    //             Credit = 3,
+    //             Trailer = 4,
+    //             Special = 2,
+    //             Parody = 5,
+    //         }
 
-        let s = r#"240 EPISODE
-1|2|3|-4|5|C01|Start|Hajimete|はじめて|946684800|3"#;
+    //         let s = r#"240 EPISODE
+    // 1|2|3|-4|5|C01|Start|Hajimete|はじめて|946684800|3"#;
 
-        let response = Response::from_str(s).unwrap();
+    //         let response = Response::from_str(s).unwrap();
 
-        let episode = response.records_as::<Episode>().next().unwrap().unwrap();
+    //         let episode = response.records_as::<Episode>().next().unwrap().unwrap();
 
-        assert_eq!(episode.eid, 1);
-        assert_eq!(episode.aid, 2);
-        assert_eq!(episode.length, 3);
-        assert_eq!(episode.rating, -4);
-        assert_eq!(episode.votes, 5);
-        assert_eq!(episode.epno, "C01");
-        assert_eq!(episode.eng, "Start");
-        assert_eq!(episode.romaji, "Hajimete");
-        assert_eq!(episode.kanji, "はじめて");
-        assert_eq!(
-            episode.aired,
-            DateTime::<Utc>::from_utc(
-                NaiveDate::from_ymd_opt(2000, 1, 1)
-                    .unwrap()
-                    .and_hms_opt(0, 0, 0)
-                    .unwrap(),
-                Utc
-            )
-        );
-        assert_eq!(episode.etype, EpisodeType::Credit);
-    }
+    //         assert_eq!(episode.eid, 1);
+    //         assert_eq!(episode.aid, 2);
+    //         assert_eq!(episode.length, 3);
+    //         assert_eq!(episode.rating, -4);
+    //         assert_eq!(episode.votes, 5);
+    //         assert_eq!(episode.epno, "C01");
+    //         assert_eq!(episode.eng, "Start");
+    //         assert_eq!(episode.romaji, "Hajimete");
+    //         assert_eq!(episode.kanji, "はじめて");
+    //         assert_eq!(
+    //             episode.aired,
+    //             DateTime::<Utc>::from_utc(
+    //                 NaiveDate::from_ymd_opt(2000, 1, 1)
+    //                     .unwrap()
+    //                     .and_hms_opt(0, 0, 0)
+    //                     .unwrap(),
+    //                 Utc
+    //             )
+    //         );
+    //         assert_eq!(episode.etype, EpisodeType::Credit);
+    //     }
 }

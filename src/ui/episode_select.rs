@@ -1,6 +1,6 @@
 use std::io::{stdout, Write};
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use crossterm::{
     cursor::MoveTo,
     event::{Event, EventStream, KeyCode},
@@ -8,11 +8,15 @@ use crossterm::{
     terminal::{self, Clear, ClearType},
     QueueableCommand,
 };
+use futures::{StreamExt, TryStreamExt};
 use itertools::Itertools;
-use tokio_stream::StreamExt;
 use unicode_width::UnicodeWidthStr;
 
-use crate::anidb::records::{Anime, Episode, File, Group};
+use super::{enter_alt_screen, leave_alt_screen};
+use crate::{
+    anidb::records::{Anime, Episode, File, Group},
+    mpv::{Loadfile, LoadfileMode, Mpv, SetProperty, Stop},
+};
 
 pub struct EpisodeSelect {
     anime: Anime,
@@ -22,7 +26,13 @@ pub struct EpisodeSelect {
 
 struct EpisodeListing {
     episode: Episode,
-    files_groups: Vec<(File, Group)>,
+    files: Vec<FileListing>,
+}
+
+struct FileListing {
+    file: File,
+    group: Group,
+    paths_on_disk: Vec<String>,
 }
 
 impl EpisodeSelect {
@@ -41,7 +51,7 @@ impl EpisodeSelect {
         let mut listings = vec![];
 
         for episode in episodes {
-            let files_groups = sqlx::query!(
+            let queries = sqlx::query!(
                 "SELECT f.json as fjson, g.json as gjson FROM files f
                 INNER JOIN groups g ON f.gid = g.gid
                 WHERE f.eid = ?",
@@ -50,17 +60,26 @@ impl EpisodeSelect {
             .fetch_all(db)
             .await?
             .into_iter()
-            .map(|row| {
-                let file =
+            .map(|row| async move {
+                let file: File =
                     serde_json::from_str(&row.fjson).context("Invalid record in database")?;
-                let group =
+                let group: Group =
                     serde_json::from_str(&row.gjson).context("Invalid record in database")?;
 
-                Ok((file, group))
-            })
-            .collect::<Result<Vec<(File, Group)>>>()?;
+                let paths_on_disk =
+                    sqlx::query_scalar!("SELECT path FROM indexed_files WHERE fid = ?", file.fid)
+                        .fetch_all(db)
+                        .await?;
 
-            listings.push(EpisodeListing { episode, files_groups });
+                Result::<_, anyhow::Error>::Ok(FileListing { file, group, paths_on_disk })
+            });
+
+            let files = tokio_stream::iter(queries)
+                .buffer_unordered(10)
+                .try_collect()
+                .await?;
+
+            listings.push(EpisodeListing { episode, files });
         }
 
         Ok(Self {
@@ -83,7 +102,7 @@ impl EpisodeSelect {
         for (i, episode) in self.episodes.iter().enumerate().take(height as usize) {
             let selected = i == self.selected;
 
-            let groups = episode.files_groups.iter().map(|(_, g)| &g.name).join(", ");
+            let groups = episode.files.iter().map(|f| &f.group.name).join(", ");
 
             let mut title = format!(
                 "{}. {}  {}",
@@ -110,8 +129,46 @@ impl EpisodeSelect {
         Ok(())
     }
 
+    /// Start MPV, load all episodes as playlist, and start playing
+    /// the selected episode.
     pub async fn play(&mut self) -> Result<()> {
-        todo!()
+        leave_alt_screen()?;
+
+        let mut mpv = Mpv::new().context("mpv new")?;
+
+        let files = self
+            .episodes
+            .iter()
+            .flat_map(|e| e.files.first())
+            .flat_map(|f| f.paths_on_disk.first())
+            .cloned()
+            .collect::<Vec<_>>();
+
+        if files.is_empty() {
+            bail!("No files found on disk");
+        }
+
+        mpv.request(Stop {}).await.context("mpv stop")?;
+
+        for path in files {
+            dbg!(mpv
+                .request(Loadfile { path, mode: LoadfileMode::Append })
+                .await
+                .context("mpv loadfile")?);
+        }
+
+        mpv.request(SetProperty {
+            name: "playlist-pos".into(),
+            value: self.selected.into(),
+        })
+        .await
+        .context("mpv set playlist-pos")?;
+
+        mpv.wait().await.context("mpv wait")?;
+
+        enter_alt_screen()?;
+
+        Ok(())
     }
 
     pub async fn run(&mut self) -> Result<()> {
@@ -120,23 +177,23 @@ impl EpisodeSelect {
         let mut stdin = EventStream::new();
 
         loop {
+            self.display().await?;
+
             match stdin.next().await {
                 Some(Ok(Event::Key(key))) => match key.code {
                     KeyCode::Char('q') | KeyCode::Esc => break,
                     KeyCode::Char('j') | KeyCode::Down => {
                         self.selected = (self.selected + 1).min(self.episodes.len() - 1);
-                        self.display().await?;
                     }
                     KeyCode::Char('k') | KeyCode::Up => {
                         self.selected = self.selected.saturating_sub(1);
-                        self.display().await?;
                     }
                     KeyCode::Enter => {
                         self.play().await?;
                     }
                     ev => println!("{ev:?}"),
                 },
-                Some(Ok(Event::Resize(_, _))) => self.display().await?,
+                Some(Ok(Event::Resize(_, _))) => {}
                 Some(Err(err)) => return Err(err.into()),
                 None => break,
                 ev => println!("{ev:?}"),
