@@ -46,7 +46,18 @@ impl EpisodeSelect {
             .map(|row| serde_json::from_str(&row.json).context("Invalid record in database"))
             .collect::<Result<Vec<Episode>>>()?;
 
-        episodes.sort_by(|a, b| a.epno.cmp(&b.epno));
+        episodes.sort_by_cached_key(|Episode { epno, .. }| {
+            let Some(idx) = epno.bytes().position(|b| b.is_ascii_digit()) else {
+                return (epno.clone(), 0);
+            };
+
+            let (alpha, num) = epno.split_at(idx);
+            let Ok(num) = num.parse() else {
+                return (epno.clone(), 0);
+            };
+
+            (alpha.to_string(), num)
+        });
 
         let mut listings = vec![];
 
