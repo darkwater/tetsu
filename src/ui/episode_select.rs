@@ -134,7 +134,7 @@ impl EpisodeSelect {
     pub async fn play(&mut self) -> Result<()> {
         leave_alt_screen()?;
 
-        let mut mpv = Mpv::new().context("mpv new")?;
+        let mut mpv = Mpv::new().await.context("mpv new")?;
 
         let files = self
             .episodes
@@ -148,13 +148,13 @@ impl EpisodeSelect {
             bail!("No files found on disk");
         }
 
-        mpv.request(Stop {}).await.context("mpv stop")?;
+        mpv.request(Stop {}).await.context("mpv stop failed")?;
 
         for path in files {
             dbg!(mpv
                 .request(Loadfile { path, mode: LoadfileMode::Append })
                 .await
-                .context("mpv loadfile")?);
+                .context("mpv loadfile failed")?);
         }
 
         mpv.request(SetProperty {
@@ -162,9 +162,9 @@ impl EpisodeSelect {
             value: self.selected.into(),
         })
         .await
-        .context("mpv set playlist-pos")?;
+        .context("mpv set playlist-pos failed")?;
 
-        mpv.wait().await.context("mpv wait")?;
+        mpv.wait().await.context("mpv wait failed")?;
 
         enter_alt_screen()?;
 

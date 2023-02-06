@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use tokio::{
     io::{self, AsyncBufReadExt, AsyncWriteExt, BufReader},
-    net::UnixStream,
+    net::{UnixListener, UnixStream},
     process::{Child, Command},
     time::{sleep, Duration},
 };
@@ -18,12 +18,16 @@ pub struct Mpv {
 }
 
 impl Mpv {
-    pub fn new() -> Result<Self> {
+    pub async fn new() -> Result<Self> {
+        UnixListener::bind("/tmp/mpv-socket")?;
+
         let process = Command::new("mpv")
             .arg("--idle")
             .arg("--input-ipc-server=/tmp/mpv-socket")
             .spawn()
             .context("Failed to spawn mpv")?;
+
+        // sleep(Duration::from_millis(100)).await;
 
         Ok(Self { process, connection: None })
     }
@@ -51,7 +55,7 @@ impl Mpv {
     }
 
     pub async fn request<C: request::Command>(&mut self, command: C) -> Result<C::Output> {
-        let conn = self.connect().await?;
+        let conn = self.connect().await.context("failed to connect to mpv")?;
 
         let req = Request {
             command,
