@@ -19,7 +19,7 @@ pub struct Mpv {
 
 impl Mpv {
     pub async fn new() -> Result<Self> {
-        UnixListener::bind("/tmp/mpv-socket")?;
+        let _ = UnixListener::bind("/tmp/mpv-socket");
 
         let process = Command::new("mpv")
             .arg("--idle")
