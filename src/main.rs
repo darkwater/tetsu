@@ -15,9 +15,11 @@ use crate::config::Config;
 mod anidb;
 mod config;
 mod db;
+mod gui;
 mod indexer;
 mod log_proxy;
 mod mpv;
+mod server;
 mod ui;
 
 #[derive(Parser)]
@@ -28,6 +30,12 @@ struct Args {
 
     #[clap(long)]
     login: bool,
+
+    #[clap(long)]
+    gui: bool,
+
+    #[clap(long)]
+    server: bool,
 }
 
 lazy_static! {
@@ -48,6 +56,10 @@ async fn main() -> Result<()> {
         anidb::login().await
     } else if let Some(ref path) = ARGS.index {
         indexer::index(path).await
+    } else if ARGS.gui {
+        gui::run().await
+    } else if ARGS.server {
+        server::run().await
     } else {
         ui::run().await
     }

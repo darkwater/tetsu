@@ -12,6 +12,9 @@ chrono        = { version = "0.4.23", features = [ "serde" ] }
 clap          = { version = "4.0.32", features = [ "derive" ] }
 crossterm     = { version = "0.25.0", features = [ "event-stream" ] }
 dialoguer     = "0.10.2"
+eframe        = { version = "0.22.0", features = [ "persistence" ] }
+egui          = { version = "0.22.0", features = [ "persistence" ] }
+egui_dock     = "0.6.3"
 env_logger    = "0.10.0"
 futures       = "0.3.25"
 indicatif     = { version = "0.17.2", features = [ "rayon", "tokio" ] }
@@ -28,6 +31,7 @@ rayon         = "1.6.1"
 serde         = { version = "1.0.151", features = [ "derive" ] }
 serde_json    = { version = "1.0.91", features = [ "preserve_order" ] }
 sqlx          = { version = "0.6.2", features = [ "runtime-tokio-rustls", "sqlite", "offline" ] }
+tarpc         = { version = "0.33.0", features = [ "full" ] }
 thiserror     = "1.0.38"
 tokio         = { version = "1.23.0", features = [ "rt-multi-thread", "macros", "signal", "process" ] }
 tokio-stream  = "0.1.11"

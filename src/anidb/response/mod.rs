@@ -58,9 +58,10 @@ mod tests {
 
     use ::serde::Deserialize;
     use chrono::{DateTime, NaiveDate, Utc};
-    use serde_repr::Deserialize_repr;
 
     use super::{Response, ResponseCode};
+
+    // use serde_repr::Deserialize_repr;
 
     #[test]
     fn from_str() {

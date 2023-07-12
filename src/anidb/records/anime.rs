@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{Record, RecordSplit};
 
-#[derive(Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Anime {
     pub aid: u32,
     pub dateflags: i32,
