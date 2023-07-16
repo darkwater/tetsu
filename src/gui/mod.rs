@@ -7,9 +7,12 @@ use crate::server::interface::TetsuServerClient;
 
 mod r#async;
 mod stored;
+mod utils;
 
 pub async fn run() -> Result<()> {
-    let tetsu = crate::server::connect("192.168.0.109:5352").await?;
+    log::debug!("Connecting to server");
+    let tetsu = crate::server::connect("192.168.0.106:5352").await?;
+    log::debug!("Connected to server");
 
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(

@@ -2,11 +2,12 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 
-use crate::anidb::records::Anime;
+use crate::anidb::records::{Anime, Episode};
 
 #[tarpc::service]
 pub trait TetsuServer {
     async fn anime() -> Result<Vec<Anime>, Error>;
+    async fn episodes(aid: u32) -> Result<Vec<Episode>, Error>;
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -39,6 +39,13 @@ impl<T, P> AsyncValueChannel<T, P> {
 
         &self.latest
     }
+
+    pub fn unwrap(&self) -> &T {
+        match self.latest {
+            AsyncValue::Waiting(_) => panic!("AsyncValue is not ready"),
+            AsyncValue::Ready(ref v) => v,
+        }
+    }
 }
 
 impl<T, P> AsyncValue<T, P> {
