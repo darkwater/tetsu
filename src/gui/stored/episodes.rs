@@ -6,7 +6,7 @@ use crate::{
     anidb::records::{Anime, Episode},
     gui::{
         r#async::{AsyncValue::*, AsyncValueChannel},
-        utils::get_tetsu,
+        utils::get_apis,
     },
 };
 
@@ -17,7 +17,7 @@ pub struct Episodes {
 
 impl Episodes {
     pub fn new(ctx: &Context, anime: Anime) -> Self {
-        let tetsu = get_tetsu(ctx);
+        let tetsu = get_apis(ctx).tetsu;
 
         let aid = anime.aid;
         let episodes = AsyncValueChannel::new(move |_| async move {

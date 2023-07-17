@@ -5,7 +5,7 @@ use tarpc::context;
 use self::episodes::Episodes;
 use super::{
     r#async::{AsyncValue::*, AsyncValueChannel},
-    utils::get_tetsu,
+    utils::get_apis,
     View,
 };
 use crate::anidb::records::Anime;
@@ -19,7 +19,7 @@ pub struct StoredView {
 
 impl StoredView {
     pub fn new(ctx: &Context) -> Self {
-        let tetsu = get_tetsu(ctx);
+        let tetsu = get_apis(ctx).tetsu;
 
         let anime =
             AsyncValueChannel::new(|_| async move { Ok(tetsu.anime(context::current()).await??) });

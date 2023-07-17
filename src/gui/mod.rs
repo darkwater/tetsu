@@ -1,10 +1,12 @@
 use anyhow::Result;
 use eframe::egui;
-use egui_dock::{Style, Tree};
+use egui_dock::{NodeIndex, Style, Tree};
 
-use self::stored::StoredView;
+use self::{anichart::AnichartView, animebytes::AnimebytesView, stored::StoredView, utils::Apis};
 use crate::server::interface::TetsuServerClient;
 
+mod anichart;
+mod animebytes;
 mod r#async;
 mod stored;
 mod utils;
@@ -32,22 +34,27 @@ struct TetsuGuiApp {
 impl TetsuGuiApp {
     fn new(tetsu: TetsuServerClient, cc: &eframe::CreationContext<'_>) -> Self {
         cc.egui_ctx
-            .data_mut(|d| d.insert_temp("tetsu".into(), tetsu));
+            .data_mut(|d| d.insert_temp("apis".into(), Apis { tetsu }));
 
-        let vec: Vec<Box<dyn View>> = vec![Box::new(StoredView::new(&cc.egui_ctx))];
-        let tree = Tree::new(vec);
+        let left: Vec<Box<dyn View>> = vec![Box::new(StoredView::new(&cc.egui_ctx))];
+        let mut tree = Tree::new(left);
+
+        let right: Vec<Box<dyn View>> = vec![
+            Box::new(AnichartView::new(&cc.egui_ctx)),
+            Box::new(AnimebytesView::new(&cc.egui_ctx)),
+        ];
+        tree.split_right(NodeIndex::root(), 0.5, right);
+
         Self { tree }
     }
 }
 
 impl eframe::App for TetsuGuiApp {
     fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            egui_dock::DockArea::new(&mut self.tree)
-                .style(Style::from_egui(ui.style().as_ref()))
-                .show_close_buttons(false)
-                .show_inside(ui, &mut TabViewer {});
-        });
+        egui_dock::DockArea::new(&mut self.tree)
+            .style(Style::from_egui(ctx.style().as_ref()))
+            .show_close_buttons(false)
+            .show(ctx, &mut TabViewer {});
     }
 }
 

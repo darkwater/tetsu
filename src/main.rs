@@ -12,7 +12,9 @@ use tokio::sync::RwLock;
 
 use crate::config::Config;
 
+mod anichart;
 mod anidb;
+mod animebytes;
 mod config;
 mod db;
 mod gui;

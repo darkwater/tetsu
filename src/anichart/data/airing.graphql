@@ -1,0 +1,28 @@
+query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int) {
+  Page (page: $page, perPage: $perPage) {
+    pageInfo {
+      total
+      currentPage
+      lastPage
+      hasNextPage
+      perPage
+    }
+    media (season: $season, seasonYear: $seasonYear, sort: POPULARITY_DESC, format_in: [TV, TV_SHORT]) {
+      id
+      title {
+        romaji
+        english
+        native
+      }
+      nextAiringEpisode {
+        airingAt
+        timeUntilAiring
+        episode
+      }
+      coverImage {
+        large
+      }
+    }
+  }
+}
+

@@ -2,7 +2,11 @@ use egui::Context;
 
 use crate::server::interface::TetsuServerClient;
 
-pub fn get_tetsu(ctx: &Context) -> TetsuServerClient {
-    ctx.data(|d| d.get_temp::<TetsuServerClient>("tetsu".into()))
-        .unwrap()
+#[derive(Clone)]
+pub struct Apis {
+    pub tetsu: TetsuServerClient,
+}
+
+pub fn get_apis(ctx: &Context) -> Apis {
+    ctx.data(|d| d.get_temp::<Apis>("apis".into())).unwrap()
 }
