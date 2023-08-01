@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 anyhow        = "1.0.68"
 async_once    = "0.2.6"
+axum = "0.6.19"
 chrono        = { version = "0.4.23", features = [ "serde" ] }
 clap          = { version = "4.0.32", features = [ "derive" ] }
 crossterm     = { version = "0.25.0", features = [ "event-stream" ] }

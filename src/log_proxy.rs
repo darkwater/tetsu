@@ -10,13 +10,13 @@ impl io::Write for LogProxy {
                 progress_bar.println(line)?;
             }
 
-            return Ok(buf.len());
+            Ok(buf.len())
+        } else {
+            let mut stdout = io::stdout();
+            stdout.write_all(buf)?;
+            stdout.flush()?;
+            Ok(buf.len())
         }
-
-        let mut stdout = io::stdout();
-        stdout.write_all(buf)?;
-        stdout.flush()?;
-        Ok(buf.len())
     }
 
     fn flush(&mut self) -> io::Result<()> {
