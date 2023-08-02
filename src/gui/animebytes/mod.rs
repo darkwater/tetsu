@@ -27,6 +27,6 @@ impl View for AnimebytesView {
             .height_range(ui.spacing().interact_size.y * 2.0..=ui.spacing().interact_size.y * 3.)
             .show_inside(ui, |ui| self.status_panel.ui(ui));
 
-        egui::CentralPanel::default().show_inside(ui, |ui| {});
+        egui::CentralPanel::default().show_inside(ui, |_ui| {});
     }
 }

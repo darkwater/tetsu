@@ -56,9 +56,6 @@ impl Response {
 mod tests {
     use std::str::FromStr;
 
-    use ::serde::Deserialize;
-    use chrono::{DateTime, NaiveDate, Utc};
-
     use super::{Response, ResponseCode};
 
     // use serde_repr::Deserialize_repr;

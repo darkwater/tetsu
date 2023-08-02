@@ -1,17 +1,9 @@
 use anyhow::Result;
 use egui::{Color32, Context, NumExt, Response, Sense, Stroke, TextStyle, Ui, Vec2, WidgetText};
-use tarpc::context;
 
 use crate::{
-    animebytes::data::{
-        site_stats::SiteStatsResponse,
-        status::{Status, StatusResponse},
-    },
-    gui::{
-        r#async::{AsyncValue::*, AsyncValueChannel},
-        utils::get_apis,
-        View,
-    },
+    animebytes::data::status::{Status, StatusResponse},
+    gui::r#async::{AsyncValue::*, AsyncValueChannel},
 };
 
 pub struct StatusPanel {
@@ -19,7 +11,7 @@ pub struct StatusPanel {
 }
 
 impl StatusPanel {
-    pub fn new(ctx: &Context) -> Self {
+    pub fn new(_ctx: &Context) -> Self {
         let status = AsyncValueChannel::new(|_| async move { crate::animebytes::status().await });
 
         Self { status }

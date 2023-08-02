@@ -12,7 +12,7 @@ pub struct AnichartView {
 }
 
 impl AnichartView {
-    pub fn new(ctx: &Context) -> Self {
+    pub fn new(_ctx: &Context) -> Self {
         let list = AsyncValueChannel::new(|_| async move { anichart::airing().await });
 
         Self { list }

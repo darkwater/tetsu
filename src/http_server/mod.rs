@@ -1,14 +1,6 @@
-use std::net::SocketAddr;
-
 use anyhow::Context as _;
-use axum::{
-    extract::Path,
-    http::StatusCode,
-    response::IntoResponse,
-    routing::{get, post},
-    Json, Router,
-};
-use serde::{Deserialize, Serialize};
+use axum::{extract::Path, routing::get, Json, Router};
+use serde::Serialize;
 
 use crate::anidb::records::{Anime, Episode, File};
 
