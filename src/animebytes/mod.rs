@@ -14,7 +14,8 @@ pub mod data {
 }
 
 pub async fn site_stats() -> Result<SiteStatsResponse> {
-    let url = data::site_stats::ENDPOINT.replace("{passkey}", env!("ANIMEBYTES_PASS"));
+    let url = data::site_stats::ENDPOINT
+        .replace("{passkey}", option_env!("ANIMEBYTES_PASS").unwrap_or_default());
     Ok(reqwest::get(url).await?.json().await?)
 }
 
