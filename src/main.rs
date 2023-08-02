@@ -84,15 +84,18 @@ async fn main() -> Result<()> {
     });
 
     if ARGS.login {
-        anidb::login().await
+        anidb::login().await?;
     } else if let Some(ref path) = ARGS.index {
-        indexer::index(path).await
+        indexer::index(path).await?;
     } else if ARGS.gui {
-        gui::run().await
-    } else if server_handle.is_none() {
-        ui::run().await
+        gui::run().await?;
     } else {
-        server_handle.unwrap().await.unwrap();
-        Ok(())
+        ui::run().await?;
     }
+
+    if let Some(handle) = server_handle {
+        handle.await?;
+    }
+
+    Ok(())
 }
