@@ -28,6 +28,24 @@
     },
     "query": "INSERT INTO files (fid, aid, eid, gid, size, ed2k, json)\n                    VALUES ($1, $2, $3, $4, $5, $6, $7)\n                    ON CONFLICT (fid) DO UPDATE SET\n                        aid = $2,\n                        eid = $3,\n                        gid = $4,\n                        size = $5,\n                        ed2k = $6,\n                        json = $7"
   },
+  "16f81e63e6512ca0f2f87c90cce3d0dbf561a75a28b53d28fd3e6c4ee5bbe64c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "json",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT a.json\n         FROM indexed_files if\n         INNER JOIN files f\n            ON if.fid = f.fid\n         INNER JOIN anime a\n            ON f.aid = a.aid\n         GROUP BY a.aid"
+  },
   "1a7048d5cb7ae00e48739f8e075f79eff6d939523d14560e6c73a1c950e3dddd": {
     "describe": {
       "columns": [],

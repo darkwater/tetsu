@@ -1,3 +1,5 @@
+#![allow(dead_code)] // too much wip for now
+
 use std::{path::PathBuf, sync::RwLock as StdRwLock};
 
 use anidb::Anidb;
@@ -89,7 +91,7 @@ async fn main() -> Result<()> {
         indexer::index(path).await?;
     } else if ARGS.gui {
         gui::run().await?;
-    } else {
+    } else if !ARGS.no_ui {
         ui::run().await?;
     }
 

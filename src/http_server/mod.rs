@@ -1,18 +1,32 @@
-use anyhow::Context as _;
-use axum::{extract::Path, routing::get, Json, Router};
-use serde::Serialize;
+use std::sync::Arc;
 
-use crate::anidb::records::{Anime, Episode, File};
+use anyhow::Context as _;
+use axum::{
+    extract::{Path, State},
+    routing::get,
+    Json, Router,
+};
+use serde::Serialize;
+use tokio::sync::RwLock;
+
+use crate::anidb::{
+    records::{Anime, Episode, File},
+    Anidb,
+};
 
 mod error;
 
 type Result<T> = std::result::Result<T, error::AppError>;
 
 pub async fn run() -> anyhow::Result<()> {
+    let anidb = Arc::new(RwLock::new(Anidb::new()));
+
     let app = Router::new()
-        .route("/anime", get(anime))
+        .route("/anime", get(all_anime))
+        .route("/anime/:aid", get(anime))
         .route("/anime/:aid/episodes", get(anime_episodes))
-        .route("/anime/:aid/files", get(anime_files));
+        .route("/anime/:aid/files", get(anime_files))
+        .with_state(anidb);
 
     axum::Server::bind(&"127.0.0.1:5352".parse().unwrap())
         .serve(app.into_make_service())
@@ -23,20 +37,43 @@ pub async fn run() -> anyhow::Result<()> {
 #[derive(Clone)]
 pub struct Server;
 
-async fn anime() -> Result<Json<Vec<Anime>>> {
+async fn all_anime() -> Result<Json<Vec<Anime>>> {
     let db = crate::DB.get().await;
 
-    let mut anime = sqlx::query!("SELECT json FROM anime")
-        .fetch_all(db)
-        .await
-        .context("Database query failed")?
-        .into_iter()
-        .map(|row| serde_json::from_str(&row.json).context("Invalid record in database"))
-        .collect::<anyhow::Result<Vec<Anime>>>()?;
+    let mut anime = sqlx::query!(
+        "SELECT a.json
+         FROM indexed_files if
+         INNER JOIN files f
+            ON if.fid = f.fid
+         INNER JOIN anime a
+            ON f.aid = a.aid
+         GROUP BY a.aid",
+    )
+    .fetch_all(db)
+    .await
+    .context("Database query failed")?
+    .into_iter()
+    .map(|row| serde_json::from_str(&row.json).context("Invalid record in database"))
+    .collect::<anyhow::Result<Vec<Anime>>>()?;
 
     anime.sort_by(|a, b| a.romaji_name.cmp(&b.romaji_name));
 
     Ok(Json(anime))
+}
+
+async fn anime(
+    Path(aid): Path<u32>,
+    State(state): State<Arc<RwLock<Anidb>>>,
+) -> Result<Json<Anime>> {
+    Ok(Json(
+        state
+            .write()
+            .await
+            .anime_by_aid(aid)
+            .await
+            .context("Couldn't fetch from AniDB")?
+            .context("Not found on AniDB")?,
+    ))
 }
 
 async fn anime_episodes(Path(aid): Path<u32>) -> Result<Json<Vec<Episode>>> {

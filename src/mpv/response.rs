@@ -38,6 +38,8 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::unit_cmp)]
+    #[allow(clippy::bool_assert_comparison)]
     fn into_result_of() {
         assert_eq!(test_result_of::<()>(Value::Null), ());
         assert_eq!(test_result_of::<i32>(Value::from(5)), 5);
@@ -47,6 +49,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::unit_cmp)]
     fn into_result_of_none() {
         let response = Response {
             error: "success".into(),
