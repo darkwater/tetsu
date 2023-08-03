@@ -105,6 +105,7 @@ async fn anime_episodes(Path(aid): Path<u32>) -> Result<Json<Vec<Episode>>> {
 
 #[derive(Serialize)]
 struct WrappedFile {
+    #[serde(flatten)]
     info: File,
     path: String,
 }
