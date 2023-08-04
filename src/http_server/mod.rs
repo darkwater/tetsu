@@ -9,12 +9,14 @@ use axum::{
 use serde::Serialize;
 use tokio::sync::RwLock;
 
+use self::mpv::mpv_upgrade;
 use crate::anidb::{
     records::{Anime, Episode, File},
     Anidb,
 };
 
 mod error;
+mod mpv;
 
 type Result<T> = std::result::Result<T, error::AppError>;
 
@@ -26,6 +28,7 @@ pub async fn run() -> anyhow::Result<()> {
         .route("/anime/:aid", get(anime))
         .route("/anime/:aid/episodes", get(anime_episodes))
         .route("/anime/:aid/files", get(anime_files))
+        .route("/mpv", get(mpv_upgrade))
         .with_state(anidb);
 
     axum::Server::bind(&"127.0.0.1:5352".parse().unwrap())
