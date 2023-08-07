@@ -17,8 +17,11 @@ use crate::anidb::{
 
 pub mod mpv;
 pub mod platform_links;
-pub mod proxy;
 pub mod settings;
+
+pub mod proxy {
+    pub mod animebytes;
+}
 
 #[derive(Serialize)]
 pub struct AnimeWithLinks {

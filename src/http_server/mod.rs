@@ -25,7 +25,9 @@ pub async fn run() -> anyhow::Result<()> {
         .route("/mpv", get(routes::mpv::mpv_upgrade))
         .route("/settings", get(routes::settings::get))
         .route("/settings", post(routes::settings::post))
-        .route("/animebytes/search", get(routes::proxy::animebytes))
+        .route("/animebytes/search", get(routes::proxy::animebytes::search))
+        .route("/animebytes/groups/:id", get(routes::proxy::animebytes::group))
+        .route("/animebytes/torrents/:id", get(routes::proxy::animebytes::torrent))
         .route("/platform_links", get(routes::platform_links::get))
         .with_state(anidb);
 

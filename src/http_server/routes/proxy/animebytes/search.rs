@@ -4,10 +4,9 @@ use anyhow::Context;
 use axum::extract::Query;
 use serde::Deserialize;
 
-use super::super::Result;
-use crate::db::settings;
+use crate::{db::settings, http_server::Result};
 
-pub async fn animebytes(Query(mut params): Query<HashMap<String, String>>) -> Result<String> {
+pub async fn search(Query(mut params): Query<HashMap<String, String>>) -> Result<String> {
     let username = settings::animebytes::username()
         .await?
         .context("No username set")?;
@@ -31,18 +30,45 @@ pub async fn animebytes(Query(mut params): Query<HashMap<String, String>>) -> Re
     let res2 = res.clone();
 
     tokio::spawn(async move {
-        if let Err(e) = store_ids(res2).await {
-            log::error!("Failed to store platform links: {}", e);
+        if let Err(e) = store_data(&res2).await {
+            log::error!("Failed to cache Animebytes data: {}", e);
         }
     });
 
     Ok(res)
 }
 
-async fn store_ids(body: String) -> anyhow::Result<()> {
-    let parsed = serde_json::from_str::<ScrapeResponse>(&body).unwrap();
+async fn store_data(body: &str) -> anyhow::Result<()> {
+    let parsed: ScrapeResponse = serde_json::from_str(body)?;
 
     for group in parsed.groups {
+        let json = serde_json::to_string(&group)?;
+        let group: ScrapeGroup = serde_json::from_value(group)?;
+
+        sqlx::query!(
+            "INSERT INTO animebytes_groups (id, data)
+            VALUES ($1, $2)
+            ON CONFLICT (id) DO UPDATE SET data = $2",
+            group.id,
+            json,
+        )
+        .execute(crate::DB.get().await)
+        .await?;
+
+        for torrent in group.torrents {
+            sqlx::query!(
+                "INSERT INTO animebytes_torrents (torrent_id, group_id)
+                VALUES ($1, $2)
+                ON CONFLICT (torrent_id) DO NOTHING",
+                group.id,
+                torrent.id,
+            )
+            .execute(crate::DB.get().await)
+            .await?;
+        }
+
+        // store platform links
+
         let split_on = |delim| {
             move |input: Option<String>| {
                 input.and_then(|url| {
@@ -112,7 +138,7 @@ async fn store_ids(body: String) -> anyhow::Result<()> {
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 struct ScrapeResponse {
-    groups: Vec<ScrapeGroup>,
+    groups: Vec<serde_json::Value>,
 }
 
 #[derive(Deserialize)]
@@ -123,6 +149,7 @@ struct ScrapeGroup {
     // either empty array or Map<String, String>
     #[serde(deserialize_with = "maybe_deserialize_map")]
     links: ScrapeLinks,
+    torrents: Vec<ScrapeTorrent>,
 }
 
 #[derive(Deserialize)]
@@ -134,6 +161,14 @@ struct ScrapeLinks {
     ann: Option<String>,
     #[serde(rename = "MAL")]
     mal: Option<String>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct ScrapeTorrent {
+    /// ID of torrent
+    #[serde(rename = "ID")]
+    id: u32,
 }
 
 fn maybe_deserialize_map<'de, D>(deserializer: D) -> StdResult<ScrapeLinks, D::Error>
