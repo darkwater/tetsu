@@ -28,25 +28,7 @@
     },
     "query": "INSERT INTO files (fid, aid, eid, gid, size, ed2k, json)\n                    VALUES ($1, $2, $3, $4, $5, $6, $7)\n                    ON CONFLICT (fid) DO UPDATE SET\n                        aid = $2,\n                        eid = $3,\n                        gid = $4,\n                        size = $5,\n                        ed2k = $6,\n                        json = $7"
   },
-  "16f81e63e6512ca0f2f87c90cce3d0dbf561a75a28b53d28fd3e6c4ee5bbe64c": {
-    "describe": {
-      "columns": [
-        {
-          "name": "json",
-          "ordinal": 0,
-          "type_info": "Text"
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Right": 0
-      }
-    },
-    "query": "SELECT a.json\n         FROM indexed_files if\n         INNER JOIN files f\n            ON if.fid = f.fid\n         INNER JOIN anime a\n            ON f.aid = a.aid\n         GROUP BY a.aid"
-  },
-  "1a7048d5cb7ae00e48739f8e075f79eff6d939523d14560e6c73a1c950e3dddd": {
+  "1857df1d5cf2d9d9fbc4acb58e986440e60829ad69ee690e77b1f60de979c324": {
     "describe": {
       "columns": [],
       "nullable": [],
@@ -54,7 +36,17 @@
         "Right": 2
       }
     },
-    "query": "INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2"
+    "query": "INSERT INTO settings (key, value)\n        VALUES ($1, $2)\n        ON CONFLICT (key) DO UPDATE SET value = $2"
+  },
+  "1a507c311e873eb02c1a42ed442837abf7a7b9d52317b30812a852abce15d0cf": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 5
+      }
+    },
+    "query": "UPDATE platform_links\n                SET animebytes_id = $1, anidb_id = $2, ann_id = $3, mal_id = $4\n                WHERE id = $5"
   },
   "1cfe956620190e6662f2dfaddec81ff896a0e203116d54f7467a51cc74f935b6": {
     "describe": {
@@ -65,6 +57,30 @@
       }
     },
     "query": "INSERT INTO anime (aid, json)\n                    VALUES ($1, $2)\n                    ON CONFLICT (aid) DO UPDATE SET\n                        json = $2"
+  },
+  "1d07614764e4547a26949dbfaf972965e51c1af329c7b3546cb1160c38d657ae": {
+    "describe": {
+      "columns": [
+        {
+          "name": "key",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "value",
+          "ordinal": 1,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT * FROM settings"
   },
   "2045d4e9cc39872ef0a4202b387a81afe3cedf14256878024f0a4703844b6232": {
     "describe": {
@@ -130,6 +146,108 @@
     },
     "query": "SELECT json FROM files WHERE size = $1 AND ed2k = $2"
   },
+  "399db1158f810fdf7085b98cac50776767d371ca3478ca7df4ec5f7b8684fa0d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "animebytes_id",
+          "ordinal": 1,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anidb_id",
+          "ordinal": 2,
+          "type_info": "Int64"
+        },
+        {
+          "name": "ann_id",
+          "ordinal": 3,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anilist_id",
+          "ordinal": 4,
+          "type_info": "Int64"
+        },
+        {
+          "name": "mal_id",
+          "ordinal": 5,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "SELECT * FROM platform_links\n            WHERE animebytes_id = $1\n            OR (anidb_id = $2 AND anidb_id > 0)\n            OR (ann_id = $3 AND ann_id > 0)\n            OR (mal_id = $4 AND mal_id > 0)"
+  },
+  "3e90605d86b633ed45460c6947fd2bb2ccb1cb307b808f9ff21024f453df2961": {
+    "describe": {
+      "columns": [
+        {
+          "name": "json",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "id",
+          "ordinal": 1,
+          "type_info": "Int64"
+        },
+        {
+          "name": "animebytes_id",
+          "ordinal": 2,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anidb_id",
+          "ordinal": 3,
+          "type_info": "Int64"
+        },
+        {
+          "name": "ann_id",
+          "ordinal": 4,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anilist_id",
+          "ordinal": 5,
+          "type_info": "Int64"
+        },
+        {
+          "name": "mal_id",
+          "ordinal": 6,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT a.json, pl.*\n         FROM indexed_files if\n         INNER JOIN files f\n            ON if.fid = f.fid\n         INNER JOIN anime a\n            ON f.aid = a.aid\n         INNER JOIN platform_links pl\n            ON a.aid = pl.anidb_id\n         GROUP BY a.aid"
+  },
   "3f8da519814a3577fb24fe22463371f973c16f957316caf89f74bbffab3b0fc1": {
     "describe": {
       "columns": [],
@@ -139,6 +257,168 @@
       }
     },
     "query": "INSERT INTO episodes (eid, aid, json)\n                    VALUES ($1, $2, $3)\n                    ON CONFLICT (eid) DO UPDATE SET\n                        aid = $2,\n                        json = $3"
+  },
+  "42e6d657aaf5ea2b66a61c1aa6067cb6d4c48d2bb8486bc421f28dac1bd0fa6b": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "animebytes_id",
+          "ordinal": 1,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anidb_id",
+          "ordinal": 2,
+          "type_info": "Int64"
+        },
+        {
+          "name": "ann_id",
+          "ordinal": 3,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anilist_id",
+          "ordinal": 4,
+          "type_info": "Int64"
+        },
+        {
+          "name": "mal_id",
+          "ordinal": 5,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT * FROM platform_links WHERE mal_id = $1 LIMIT 1"
+  },
+  "45e5a09b9e69155ad7c396906b272f6a87232ca6bbc1503a3d0cf8d7fae5589c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "animebytes_id",
+          "ordinal": 1,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anidb_id",
+          "ordinal": 2,
+          "type_info": "Int64"
+        },
+        {
+          "name": "ann_id",
+          "ordinal": 3,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anilist_id",
+          "ordinal": 4,
+          "type_info": "Int64"
+        },
+        {
+          "name": "mal_id",
+          "ordinal": 5,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT * FROM platform_links WHERE ann_id = $1 LIMIT 1"
+  },
+  "4e9b3c758b536027389997b495bc1d45b05fc29fea6791037933898bca718900": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "animebytes_id",
+          "ordinal": 1,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anidb_id",
+          "ordinal": 2,
+          "type_info": "Int64"
+        },
+        {
+          "name": "ann_id",
+          "ordinal": 3,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anilist_id",
+          "ordinal": 4,
+          "type_info": "Int64"
+        },
+        {
+          "name": "mal_id",
+          "ordinal": 5,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT * FROM platform_links WHERE animebytes_id = $1 LIMIT 1"
+  },
+  "570221418601b7ecda51ee77dc4e6bf2a9b6784c0fd3a3ae0236d63a059b9216": {
+    "describe": {
+      "columns": [
+        {
+          "name": "data",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT data\n         FROM animebytes_groups\n         WHERE id = $1"
   },
   "6ecf27a1020c21f3eaf7b4fc6e904b2924c788316cb0be0ff500aa45fbe96ae6": {
     "describe": {
@@ -157,6 +437,24 @@
       }
     },
     "query": "SELECT path FROM indexed_files WHERE path = ?"
+  },
+  "83fe0d730fe3720d406b1fd633585c64e490acd8bb26d4439665816f91f117b4": {
+    "describe": {
+      "columns": [
+        {
+          "name": "mal_id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT mal_id FROM platform_links\n        WHERE anilist_id = 0 AND mal_id > 0"
   },
   "952c16507bd88ec5e29d0210c60f09e79e60735ff66a4f65100a659463ef7781": {
     "describe": {
@@ -204,6 +502,140 @@
     },
     "query": "SELECT json FROM episodes WHERE aid = ?"
   },
+  "9b6d36526f4c7bec38bbac17cb257f5f857ff85ee372107fd77b5d5c0f9c0da7": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "INSERT INTO platform_links (animebytes_id, anidb_id, ann_id, mal_id)\n                VALUES ($1, $2, $3, $4)"
+  },
+  "a55923e5e4fb13a14b5f83e006aa272d07ae5910a3366db27ffe0e79fd58bad5": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "SELECT id FROM platform_links\n                    WHERE anidb_id = $1 OR ann_id = $2"
+  },
+  "ac9eeb1731ede302fb2d4747e87f2cc1839a83b1aed608f9c02fecf465de5885": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "INSERT INTO settings (key, value)\n                    VALUES ($1, $2)\n                    ON CONFLICT (key) DO UPDATE SET value = $2"
+  },
+  "ae6cca8d20aa55318b6aaf173abb95eb0ef65a34c18bd9f0a93dc0406046d47a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "animebytes_id",
+          "ordinal": 1,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anidb_id",
+          "ordinal": 2,
+          "type_info": "Int64"
+        },
+        {
+          "name": "ann_id",
+          "ordinal": 3,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anilist_id",
+          "ordinal": 4,
+          "type_info": "Int64"
+        },
+        {
+          "name": "mal_id",
+          "ordinal": 5,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT * FROM platform_links WHERE anilist_id = $1 LIMIT 1"
+  },
+  "bc91b94f8b045daecdc63af0b472111ad7e7b6ceafc9bc90327f93258de8aa1a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "animebytes_id",
+          "ordinal": 1,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anidb_id",
+          "ordinal": 2,
+          "type_info": "Int64"
+        },
+        {
+          "name": "ann_id",
+          "ordinal": 3,
+          "type_info": "Int64"
+        },
+        {
+          "name": "anilist_id",
+          "ordinal": 4,
+          "type_info": "Int64"
+        },
+        {
+          "name": "mal_id",
+          "ordinal": 5,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT * FROM platform_links WHERE anidb_id = $1 LIMIT 1"
+  },
   "c03f88f9e691e612ec6d03721992f92b8fff611990b7df10cd026d7896c28ebd": {
     "describe": {
       "columns": [
@@ -221,6 +653,56 @@
       }
     },
     "query": "SELECT json FROM episodes WHERE eid = $1"
+  },
+  "cf478dd9e2d9ea219fc42a149b52059e68cb6cd6f5f4536df1b7dff9b7c501c4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "UPDATE platform_links\n                        SET anidb_id = $1, ann_id = $2\n                        WHERE id = $3"
+  },
+  "cff76f5b9781161eefc1100215defa370884db26efcee526ac08a74fe2e4f66d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "INSERT INTO animebytes_groups (id, data)\n            VALUES ($1, $2)\n            ON CONFLICT (id) DO UPDATE SET data = $2"
+  },
+  "d3fff687470af6db2bee2c5fcbb347d521ce840347a5a6e7769ef625a9b7d41b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "INSERT INTO platform_links (anidb_id, ann_id)\n                        VALUES ($1, $2)"
+  },
+  "d61eb1b67d6e103a8872112250bc731377ef16ffe424ebb0fa6df99094d03117": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "UPDATE platform_links\n                SET anilist_id = $1\n                WHERE mal_id = $2"
+  },
+  "db469d47e75258490105a63f55320fc14320e28f6d66250a68169218843612a2": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "INSERT INTO animebytes_torrents (torrent_id, group_id)\n                VALUES ($1, $2)\n                ON CONFLICT (torrent_id) DO NOTHING"
   },
   "ddca3eb96a481e87c16fd24000924d6914a6a6b329ad7621736c378a8f4ade36": {
     "describe": {
@@ -263,6 +745,24 @@
       }
     },
     "query": "SELECT json FROM anime WHERE aid = $1"
+  },
+  "ed7c1979efd9bf56bc238073db41ac241f6205c24538e65871db0665fd38d30d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "data",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT g.data\n         FROM animebytes_torrents t\n         INNER JOIN animebytes_groups g\n            ON t.group_id = g.id\n         WHERE t.torrent_id = $1"
   },
   "f00e15135e2b65e8d3a3d45ac52ee31cbcb33d75ecf540be0011d02461dc22ec": {
     "describe": {
