@@ -193,7 +193,7 @@ impl Session {
     pub async fn anime_by_aid(&mut self, aid: u32) -> Result<Option<Anime>> {
         let cmd = CommandBuilder::new("ANIME")
             .arg("aid", aid)
-            .arg("amask", "fce8ba010080f8");
+            .arg("amask", "fce8ba014080f8");
 
         let res = self.request(cmd).await?;
 
@@ -221,6 +221,37 @@ impl Session {
                 )
                 .execute(crate::DB.get().await)
                 .await?;
+
+                let link = sqlx::query!(
+                    "SELECT id FROM platform_links
+                    WHERE anidb_id = $1 OR ann_id = $2",
+                    anime.aid,
+                    anime.ann_id,
+                )
+                .fetch_optional(crate::DB.get().await)
+                .await?;
+
+                if let Some(link) = link {
+                    sqlx::query!(
+                        "UPDATE platform_links
+                        SET anidb_id = $1, ann_id = $2
+                        WHERE id = $3",
+                        anime.aid,
+                        anime.ann_id,
+                        link.id,
+                    )
+                    .execute(crate::DB.get().await)
+                    .await?;
+                } else {
+                    sqlx::query!(
+                        "INSERT INTO platform_links (anidb_id, ann_id)
+                        VALUES ($1, $2)",
+                        anime.aid,
+                        anime.ann_id,
+                    )
+                    .execute(crate::DB.get().await)
+                    .await?;
+                }
 
                 Ok(Some(anime))
             }

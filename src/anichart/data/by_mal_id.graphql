@@ -1,0 +1,5 @@
+query ($malId: Int) {
+  Media (idMal: $malId) {
+    id
+  }
+}

@@ -1,8 +1,11 @@
 macro_rules! setting {
-    ($name:ident ( $ty:ty )) => {
+    ($prefix:ident $name:ident ( $ty:ty )) => {
         paste::paste! {
             pub async fn $name() -> anyhow::Result<Option<$ty>> {
-                sqlx::query!("SELECT value FROM settings WHERE key = $1", stringify!($name))
+                sqlx::query!(
+                    "SELECT value FROM settings WHERE key = $1",
+                    concat!(stringify!($prefix), "_", stringify!($name)),
+                )
                     .fetch_optional(crate::DB.get().await)
                     .await?
                     .map(|r| serde_json::from_str(&r.value))
@@ -14,8 +17,11 @@ macro_rules! setting {
                 let val = serde_json::to_string(&value)?;
 
                 sqlx::query!(
-                    "INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2",
-                    stringify!($name), val,
+                    "INSERT INTO settings (key, value)
+                    VALUES ($1, $2)
+                    ON CONFLICT (key) DO UPDATE SET value = $2",
+                    concat!(stringify!($prefix), "_", stringify!($name)),
+                    val,
                 )
                     .execute(crate::DB.get().await)
                     .await
@@ -27,7 +33,12 @@ macro_rules! setting {
 }
 
 pub mod anidb {
-    setting!(username(String));
-    setting!(password(String));
-    setting!(session_key(String));
+    setting!(anidb username(String));
+    setting!(anidb password(String));
+    setting!(anidb session_key(String));
+}
+
+pub mod animebytes {
+    setting!(animebytes username(String));
+    setting!(animebytes torrentkey(String));
 }

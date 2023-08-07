@@ -73,6 +73,10 @@ async fn main() -> Result<()> {
 
     let server_handle = ARGS.server.as_ref().map(|stype| {
         tokio::spawn(async move {
+            anichart::linker::run().await;
+        });
+
+        tokio::spawn(async move {
             let res = match stype {
                 ServerType::Tarpc => server::run().await,
                 ServerType::Http => http_server::run().await,
