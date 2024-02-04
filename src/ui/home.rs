@@ -37,21 +37,26 @@ impl Home {
 
     pub async fn display(&self) -> Result<()> {
         let (width, height) = terminal::size()?;
+        let width = width as usize;
+        let height = height as usize;
 
         let mut stdout = stdout();
 
         stdout.queue(Clear(ClearType::All))?.queue(MoveTo(0, 0))?;
 
-        for (i, anime) in self.anime.iter().enumerate().take(height as usize) {
+        let max = self.anime.len().saturating_sub(height);
+        let start = self.selected.saturating_sub(height / 2).min(max);
+
+        for (i, anime) in self.anime.iter().skip(start).take(height).enumerate() {
             let mut title = anime.romaji_name.as_str();
 
-            if title.width() > width as usize {
-                title = &title[..width as usize];
+            if title.width() > width {
+                title = &title[..width];
             }
 
             stdout
                 .queue(MoveTo(0, i as u16))?
-                .queue(PrintStyledContent(if i == self.selected {
+                .queue(PrintStyledContent(if i == self.selected - start {
                     title.black().bold().on_blue()
                 } else {
                     title.blue()
