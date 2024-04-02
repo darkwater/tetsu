@@ -97,10 +97,20 @@ async fn main() -> Result<()> {
         gui::run().await?;
     } else if !ARGS.no_ui {
         ui::run().await?;
+
+        if let Some(ref handle) = server_handle {
+            handle.abort();
+        }
     }
 
     if let Some(handle) = server_handle {
-        handle.await?;
+        let res = handle.await;
+
+        if let Err(e) = res {
+            if !e.is_cancelled() {
+                Err(e)?
+            }
+        }
     }
 
     Ok(())
