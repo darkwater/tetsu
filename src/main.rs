@@ -3,7 +3,7 @@
 use std::{path::PathBuf, sync::RwLock as StdRwLock};
 
 use anidb::Anidb;
-use anyhow::Result;
+use anyhow::{bail, Result};
 use async_once::AsyncOnce;
 use clap::{Parser, ValueEnum};
 use env_logger::Target;
@@ -30,21 +30,27 @@ mod ui;
 #[derive(Parser)]
 #[clap(version, author, about)]
 struct Args {
-    #[clap(long)]
-    index: Option<PathBuf>,
-
-    #[clap(long)]
-    login: bool,
-
-    #[clap(long)]
-    gui: bool,
-
+    /// Enable remote control
     #[clap(long)]
     server: Option<ServerType>,
 
-    /// Combine with --server to disable the TUI
-    #[clap(long)]
-    no_ui: bool,
+    #[clap(subcommand)]
+    subcommand: Option<Subcommand>,
+}
+
+#[derive(Parser)]
+enum Subcommand {
+    /// Login to AniDB
+    Login,
+
+    /// Index a directory of anime files
+    Index { path: PathBuf },
+
+    /// Run the TUI
+    Tui,
+
+    /// Run the GUI
+    Gui,
 }
 
 #[derive(Clone, ValueEnum)]
@@ -63,7 +69,7 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    if ARGS.server.is_some() && ARGS.no_ui && std::env::var("RUST_LOG").is_err() {
+    if ARGS.server.is_some() && ARGS.subcommand.is_none() && std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
     }
 
@@ -89,18 +95,27 @@ async fn main() -> Result<()> {
         })
     });
 
-    if ARGS.login {
-        anidb::login().await?;
-    } else if let Some(ref path) = ARGS.index {
-        indexer::index(path).await?;
-    } else if ARGS.gui {
-        gui::run().await?;
-    } else if !ARGS.no_ui {
-        ui::run().await?;
-
-        if let Some(ref handle) = server_handle {
-            handle.abort();
+    match ARGS.subcommand {
+        Some(Subcommand::Login) => {
+            anidb::login().await?;
         }
+        Some(Subcommand::Index { ref path }) => {
+            indexer::index(path).await?;
+        }
+        Some(Subcommand::Tui) => {
+            ui::run().await?;
+
+            if let Some(ref handle) = server_handle {
+                handle.abort();
+            }
+        }
+        Some(Subcommand::Gui) => {
+            gui::run().await?;
+        }
+        None if ARGS.server.is_none() => {
+            bail!("No action specified");
+        }
+        None => {}
     }
 
     if let Some(handle) = server_handle {
@@ -108,7 +123,7 @@ async fn main() -> Result<()> {
 
         if let Err(e) = res {
             if !e.is_cancelled() {
-                Err(e)?
+                Err(e)?;
             }
         }
     }
