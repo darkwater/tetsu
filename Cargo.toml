@@ -21,6 +21,7 @@ futures       = "0.3.31"
 indicatif     = { version = "0.17.8", features = [ "rayon", "tokio" ] }
 itertools     = "0.13.0"
 lazy_static   = "1.5.0"
+libmpv2       = "4.1.0"
 log           = "0.4.22"
 md4           = "0.10.2"
 memmap        = "0.7.0"
@@ -38,6 +39,6 @@ tarpc         = { version = "0.35.0", features = [ "full" ] }
 thiserror     = "2.0.3"
 tokio         = { version = "1.41.1", features = [ "rt-multi-thread", "macros", "signal", "process", "parking_lot" ] }
 tokio-stream  = "0.1.16"
-tokio-util = { version = "0.7.12", features = ["codec"] }
+tokio-util    = { version = "0.7.12", features = ["codec"] }
 toml          = "0.8.19"
 unicode-width = "0.2.0"

@@ -1,80 +1,61 @@
-use anyhow::Result;
-use eframe::egui;
-use egui_dock::{DockState, NodeIndex, Style};
+use std::ffi::{c_void, CStr, CString};
 
-use self::{anichart::AnichartView, animebytes::AnimebytesView, stored::StoredView, utils::Apis};
-use crate::server::interface::TetsuServerClient;
+use libmpv2::{
+    render::{OpenGLInitParams, RenderContext, RenderParam, RenderParamApiType},
+    Mpv,
+};
 
-mod anichart;
-mod animebytes;
-mod r#async;
-mod stored;
-mod utils;
+use self::app::MyApp;
 
-pub async fn run() -> Result<()> {
-    log::debug!("Connecting to server");
-    let tetsu = crate::server::connect("127.0.0.1:5352").await?;
-    log::debug!("Connected to server");
+mod app;
 
-    let native_options = eframe::NativeOptions::default();
+struct GlContext<'a> {
+    get_proc_address: &'a dyn Fn(&CStr) -> *const c_void,
+}
+
+pub fn run() -> eframe::Result<()> {
+    let options = eframe::NativeOptions {
+        window_builder: Some(Box::new(|wb| wb.with_app_id("darkplayer"))),
+        ..Default::default()
+    };
+
     eframe::run_native(
-        "Tetsu",
-        native_options,
-        Box::new(|cc| Ok(Box::new(TetsuGuiApp::new(tetsu, cc)))),
+        "Darkplayer",
+        options,
+        Box::new(|cc| {
+            let mut mpv = Mpv::with_initializer(|init| {
+                init.set_property("vo", "libmpv")?;
+                init.set_property("ao", "pipewire")?;
+                init.set_property("video-timing-offset", 0)?;
+                Ok(())
+            })
+            .unwrap();
+
+            mpv.event_context_mut().disable_deprecated_events().unwrap();
+
+            let mut render_context = RenderContext::new(
+                unsafe { mpv.ctx.as_mut() },
+                vec![
+                    RenderParam::ApiType(RenderParamApiType::OpenGl),
+                    RenderParam::InitParams(OpenGLInitParams {
+                        ctx: GlContext {
+                            get_proc_address: cc.get_proc_address.unwrap(),
+                        },
+                        get_proc_address: |ctx, name| {
+                            (ctx.get_proc_address)(&CString::new(name).unwrap()) as *mut _
+                        },
+                    }),
+                ],
+            )
+            .expect("Failed creating render context");
+
+            let ctx = cc.egui_ctx.clone();
+
+            render_context.set_update_callback(move || {
+                ctx.request_repaint();
+            });
+
+            Ok(Box::new(MyApp::new(mpv, render_context, cc)))
+        }),
     )
-    .unwrap();
-
-    Ok(())
-}
-
-struct TetsuGuiApp {
-    state: DockState<Box<dyn View>>,
-}
-
-impl TetsuGuiApp {
-    fn new(tetsu: TetsuServerClient, cc: &eframe::CreationContext<'_>) -> Self {
-        cc.egui_ctx
-            .data_mut(|d| d.insert_temp("apis".into(), Apis { tetsu }));
-
-        let left: Vec<Box<dyn View>> = vec![Box::new(StoredView::new(&cc.egui_ctx))];
-        let mut state = DockState::new(left);
-
-        let right: Vec<Box<dyn View>> = vec![
-            Box::new(AnichartView::new(&cc.egui_ctx)),
-            Box::new(AnimebytesView::new(&cc.egui_ctx)),
-        ];
-        state
-            .main_surface_mut()
-            .split_right(NodeIndex::root(), 0.5, right);
-
-        Self { state }
-    }
-}
-
-impl eframe::App for TetsuGuiApp {
-    fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
-        egui_dock::DockArea::new(&mut self.state)
-            .style(Style::from_egui(ctx.style().as_ref()))
-            .show_close_buttons(false)
-            .show(ctx, &mut TabViewer {});
-    }
-}
-
-struct TabViewer;
-
-impl egui_dock::TabViewer for TabViewer {
-    type Tab = Box<dyn View>;
-
-    fn ui(&mut self, ui: &mut egui::Ui, tab: &mut Self::Tab) {
-        tab.ui(ui);
-    }
-
-    fn title(&mut self, tab: &mut Self::Tab) -> egui::WidgetText {
-        tab.title()
-    }
-}
-
-trait View {
-    fn title(&self) -> egui::WidgetText;
-    fn ui(&mut self, ui: &mut egui::Ui);
 }

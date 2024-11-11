@@ -10,8 +10,8 @@ use tokio::net::ToSocketAddrs;
 
 use self::interface::{TetsuServer, TetsuServerClient};
 
+mod ifimpl;
 pub mod interface;
-mod server;
 
 pub async fn run() -> Result<()> {
     let server_addr = (IpAddr::V4(Ipv4Addr::UNSPECIFIED), 5352);
@@ -26,7 +26,7 @@ pub async fn run() -> Result<()> {
             Ok(transport) => {
                 tokio::spawn(
                     BaseChannel::with_defaults(transport)
-                        .execute(self::server::Server.serve())
+                        .execute(self::ifimpl::Server.serve())
                         .for_each(|response| async move {
                             tokio::spawn(response);
                         }),

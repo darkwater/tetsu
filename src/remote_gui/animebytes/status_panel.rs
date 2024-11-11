@@ -3,7 +3,7 @@ use egui::{Color32, Context, NumExt, Response, Sense, Stroke, TextStyle, Ui, Vec
 
 use crate::{
     animebytes::data::status::{Status, StatusResponse},
-    gui::r#async::{AsyncValue::*, AsyncValueChannel},
+    remote_gui::r#async::{AsyncValue::*, AsyncValueChannel},
 };
 
 pub struct StatusPanel {
@@ -64,11 +64,12 @@ fn status_icon(ui: &mut Ui, status: Status, label: &str) -> Response {
             Status::MaintenanceOrPartialOutage => (Color32::YELLOW, Color32::BROWN),
         };
 
-        ui.painter()
-            .circle(small_icon_rect.center(), small_icon_rect.width() / 2., fill, Stroke {
-                color: stroke,
-                width: 1.,
-            });
+        ui.painter().circle(
+            small_icon_rect.center(),
+            small_icon_rect.width() / 2.,
+            fill,
+            Stroke { color: stroke, width: 1. },
+        );
 
         let text_pos = egui::pos2(
             rect.min.x + icon_width + icon_spacing,

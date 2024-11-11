@@ -3,7 +3,7 @@
 use std::{path::PathBuf, sync::RwLock as StdRwLock};
 
 use anidb::Anidb;
-use anyhow::{bail, Result};
+use anyhow::Result;
 use async_once::AsyncOnce;
 use clap::{Parser, ValueEnum};
 use env_logger::Target;
@@ -24,6 +24,7 @@ mod http_server;
 mod indexer;
 mod log_proxy;
 mod mpv;
+mod remote_gui;
 mod server;
 mod ui;
 
@@ -38,7 +39,7 @@ struct Args {
     subcommand: Option<Subcommand>,
 }
 
-#[derive(Parser)]
+#[derive(Parser, Default)]
 enum Subcommand {
     /// Login to AniDB
     Login,
@@ -47,10 +48,14 @@ enum Subcommand {
     Index { path: PathBuf },
 
     /// Run the TUI
+    #[default]
     Tui,
 
     /// Run the GUI
     Gui,
+
+    /// Connect to a remote Tetsu instance
+    RemoteGui { addr: String },
 }
 
 #[derive(Clone, ValueEnum)]
@@ -96,13 +101,14 @@ async fn main() -> Result<()> {
     });
 
     match ARGS.subcommand {
+        None if ARGS.server.is_some() => {}
         Some(Subcommand::Login) => {
             anidb::login().await?;
         }
         Some(Subcommand::Index { ref path }) => {
             indexer::index(path).await?;
         }
-        Some(Subcommand::Tui) => {
+        None | Some(Subcommand::Tui) => {
             ui::run().await?;
 
             if let Some(ref handle) = server_handle {
@@ -110,12 +116,11 @@ async fn main() -> Result<()> {
             }
         }
         Some(Subcommand::Gui) => {
-            gui::run().await?;
+            gui::run().unwrap();
         }
-        None if ARGS.server.is_none() => {
-            bail!("No action specified");
+        Some(Subcommand::RemoteGui { ref addr }) => {
+            remote_gui::run(addr).await?;
         }
-        None => {}
     }
 
     if let Some(handle) = server_handle {

@@ -4,7 +4,7 @@ use tarpc::context;
 
 use crate::{
     anidb::records::{Anime, Episode},
-    gui::{
+    remote_gui::{
         r#async::{AsyncValue::*, AsyncValueChannel},
         utils::get_apis,
     },
