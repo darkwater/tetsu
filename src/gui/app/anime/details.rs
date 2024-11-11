@@ -5,8 +5,7 @@ use futures::{StreamExt as _, TryStreamExt as _};
 use crate::{
     anidb::records::{Anime, Episode, File, Group},
     gui::app::{
-        future_state::FutureState,
-        page::{Page, PageAction},
+        autofocus::AutofocusExt as _, future_state::FutureState, page::{Page, PageAction}
     },
 };
 
@@ -104,7 +103,7 @@ impl Page for AnimeDetails {
 
         ui.add(Episodes { aid: self.0.aid }.ready_ui(|ui, state| {
             for item in state {
-                if ui.button(&item.episode.romaji).clicked() {
+                if ui.button(&item.episode.romaji).autofocus(ui.ctx()).clicked() {
                     action = Some(PageAction::LoadFile(
                         item.files
                             .first()

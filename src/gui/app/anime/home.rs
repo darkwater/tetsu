@@ -4,6 +4,7 @@ use egui::{Context, Ui};
 use crate::{
     anidb::records::Anime,
     gui::app::{
+        autofocus::AutofocusExt as _,
         future_state::FutureState,
         page::{Page, PageAction},
     },
@@ -40,7 +41,7 @@ impl Page for AnimeHome {
         let mut action = None;
         ui.add(Shows.ready_ui(|ui, state| {
             for anime in state {
-                if ui.button(&anime.romaji_name).clicked() {
+                if ui.button(&anime.romaji_name).autofocus(ui.ctx()).clicked() {
                     action = Some(PageAction::Push(Box::new(AnimeDetails(anime.clone()))));
                 }
             }

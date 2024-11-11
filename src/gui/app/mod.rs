@@ -8,6 +8,7 @@ use egui::{Context, ViewportCommand};
 use libmpv2::{events::Event, render::RenderContext, Mpv};
 
 mod anime;
+mod autofocus;
 mod future_state;
 mod page;
 
