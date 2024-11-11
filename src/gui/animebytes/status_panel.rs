@@ -75,7 +75,7 @@ fn status_icon(ui: &mut Ui, status: Status, label: &str) -> Response {
             rect.center().y - 0.5 * text.size().y,
         );
 
-        text.paint_with_visuals(ui.painter(), text_pos, visuals);
+        ui.painter().galley(text_pos, text, visuals.fg_stroke.color);
     }
 
     response

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT g.data\n         FROM animebytes_torrents t\n         INNER JOIN animebytes_groups g\n            ON t.group_id = g.id\n         WHERE t.torrent_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "name": "data",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ed7c1979efd9bf56bc238073db41ac241f6205c24538e65871db0665fd38d30d"
+}

@@ -50,17 +50,11 @@ impl<T, P> AsyncValueChannel<T, P> {
 
 impl<T, P> AsyncValue<T, P> {
     pub fn is_waiting(&self) -> bool {
-        match self {
-            AsyncValue::Waiting(_) => true,
-            _ => false,
-        }
+        matches!(self, AsyncValue::Waiting(_))
     }
 
     pub fn is_ready(&self) -> bool {
-        match self {
-            AsyncValue::Ready(_) => true,
-            _ => false,
-        }
+        matches!(self, AsyncValue::Ready(_))
     }
 }
 

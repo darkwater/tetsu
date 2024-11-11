@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO animebytes_groups (id, data)\n            VALUES ($1, $2)\n            ON CONFLICT (id) DO UPDATE SET data = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "cff76f5b9781161eefc1100215defa370884db26efcee526ac08a74fe2e4f66d"
+}

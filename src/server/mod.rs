@@ -24,10 +24,13 @@ pub async fn run() -> Result<()> {
 
         match sock {
             Ok(transport) => {
-                tokio::spawn(async move {
-                    let channel = BaseChannel::with_defaults(transport);
-                    channel.execute(self::server::Server.serve()).await;
-                });
+                tokio::spawn(
+                    BaseChannel::with_defaults(transport)
+                        .execute(self::server::Server.serve())
+                        .for_each(|response| async move {
+                            tokio::spawn(response);
+                        }),
+                );
             }
             Err(e) => {
                 log::error!("Error accepting connection: {}", e);

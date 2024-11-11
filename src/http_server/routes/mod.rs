@@ -52,11 +52,11 @@ pub async fn all_anime() -> Result<Json<Vec<AnimeWithLinks>>> {
         Ok(AnimeWithLinks {
             anime: serde_json::from_str(&row.json).context("Invalid record in database")?,
             links: PlatformLinks {
-                animebytes_id: NonZeroU64::new(row.animebytes_id as u64),
-                anidb_id: NonZeroU64::new(row.anidb_id as u64),
-                ann_id: NonZeroU64::new(row.ann_id as u64),
-                anilist_id: NonZeroU64::new(row.anilist_id as u64),
-                mal_id: NonZeroU64::new(row.mal_id as u64),
+                animebytes_id: NonZeroU64::new(row.animebytes_id.unwrap_or_default() as u64),
+                anidb_id: NonZeroU64::new(row.anidb_id.unwrap_or_default() as u64),
+                ann_id: NonZeroU64::new(row.ann_id.unwrap_or_default() as u64),
+                anilist_id: NonZeroU64::new(row.anilist_id.unwrap_or_default() as u64),
+                mal_id: NonZeroU64::new(row.mal_id.unwrap_or_default() as u64),
             },
         })
     })

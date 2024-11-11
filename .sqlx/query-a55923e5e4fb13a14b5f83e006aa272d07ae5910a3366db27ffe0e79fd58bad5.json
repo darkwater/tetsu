@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id FROM platform_links\n                    WHERE anidb_id = $1 OR ann_id = $2",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "a55923e5e4fb13a14b5f83e006aa272d07ae5910a3366db27ffe0e79fd58bad5"
+}

@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT if.path, f.json\n         FROM indexed_files if\n         INNER JOIN files f\n            ON if.fid = f.fid\n         WHERE f.aid = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "path",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "json",
+        "ordinal": 1,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "f00e15135e2b65e8d3a3d45ac52ee31cbcb33d75ecf540be0011d02461dc22ec"
+}

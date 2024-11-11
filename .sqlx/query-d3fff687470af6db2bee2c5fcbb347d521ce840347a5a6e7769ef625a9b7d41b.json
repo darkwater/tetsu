@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO platform_links (anidb_id, ann_id)\n                        VALUES ($1, $2)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "d3fff687470af6db2bee2c5fcbb347d521ce840347a5a6e7769ef625a9b7d41b"
+}

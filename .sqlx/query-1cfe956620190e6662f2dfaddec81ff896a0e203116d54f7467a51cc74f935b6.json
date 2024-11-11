@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO anime (aid, json)\n                    VALUES ($1, $2)\n                    ON CONFLICT (aid) DO UPDATE SET\n                        json = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "1cfe956620190e6662f2dfaddec81ff896a0e203116d54f7467a51cc74f935b6"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO platform_links (animebytes_id, anidb_id, ann_id, mal_id)\n                VALUES ($1, $2, $3, $4)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "9b6d36526f4c7bec38bbac17cb257f5f857ff85ee372107fd77b5d5c0f9c0da7"
+}

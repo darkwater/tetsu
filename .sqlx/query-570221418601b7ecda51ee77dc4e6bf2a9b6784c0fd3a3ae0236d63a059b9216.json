@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT data\n         FROM animebytes_groups\n         WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "name": "data",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "570221418601b7ecda51ee77dc4e6bf2a9b6784c0fd3a3ae0236d63a059b9216"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO episodes (eid, aid, json)\n                    VALUES ($1, $2, $3)\n                    ON CONFLICT (eid) DO UPDATE SET\n                        aid = $2,\n                        json = $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "3f8da519814a3577fb24fe22463371f973c16f957316caf89f74bbffab3b0fc1"
+}

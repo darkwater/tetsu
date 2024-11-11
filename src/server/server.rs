@@ -7,7 +7,6 @@ use crate::anidb::records::{Anime, Episode};
 #[derive(Clone)]
 pub struct Server;
 
-#[tarpc::server]
 impl TetsuServer for Server {
     async fn anime(self, _: Context) -> Result<Vec<Anime>, Error> {
         let db = crate::DB.get().await;

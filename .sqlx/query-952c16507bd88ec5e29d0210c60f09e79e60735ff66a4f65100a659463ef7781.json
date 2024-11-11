@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO groups (gid, json)\n                    VALUES ($1, $2)\n                    ON CONFLICT (gid) DO UPDATE SET\n                        json = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "952c16507bd88ec5e29d0210c60f09e79e60735ff66a4f65100a659463ef7781"
+}

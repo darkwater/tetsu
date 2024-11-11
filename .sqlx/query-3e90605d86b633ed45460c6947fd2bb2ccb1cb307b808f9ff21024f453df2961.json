@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT a.json, pl.*\n         FROM indexed_files if\n         INNER JOIN files f\n            ON if.fid = f.fid\n         INNER JOIN anime a\n            ON f.aid = a.aid\n         INNER JOIN platform_links pl\n            ON a.aid = pl.anidb_id\n         GROUP BY a.aid",
+  "describe": {
+    "columns": [
+      {
+        "name": "json",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "animebytes_id",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "anidb_id",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "ann_id",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "anilist_id",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "mal_id",
+        "ordinal": 6,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "3e90605d86b633ed45460c6947fd2bb2ccb1cb307b808f9ff21024f453df2961"
+}

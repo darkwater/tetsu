@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM platform_links\n            WHERE animebytes_id = $1\n            OR (anidb_id = $2 AND anidb_id > 0)\n            OR (ann_id = $3 AND ann_id > 0)\n            OR (mal_id = $4 AND mal_id > 0)",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "animebytes_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "anidb_id",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "ann_id",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "anilist_id",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "mal_id",
+        "ordinal": 5,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "399db1158f810fdf7085b98cac50776767d371ca3478ca7df4ec5f7b8684fa0d"
+}

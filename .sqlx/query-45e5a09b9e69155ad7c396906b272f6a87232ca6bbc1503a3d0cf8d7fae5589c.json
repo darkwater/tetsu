@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM platform_links WHERE ann_id = $1 LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "animebytes_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "anidb_id",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "ann_id",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "anilist_id",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "mal_id",
+        "ordinal": 5,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "45e5a09b9e69155ad7c396906b272f6a87232ca6bbc1503a3d0cf8d7fae5589c"
+}

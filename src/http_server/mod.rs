@@ -5,7 +5,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use tokio::sync::RwLock;
+use tokio::{net::TcpListener, sync::RwLock};
 
 use crate::anidb::Anidb;
 
@@ -31,8 +31,6 @@ pub async fn run() -> anyhow::Result<()> {
         .route("/platform_links", get(routes::platform_links::get))
         .with_state(anidb);
 
-    axum::Server::bind(&"127.0.0.1:5352".parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .context("Server error")
+    let listener = TcpListener::bind("127.0.0.1:5352").await?;
+    axum::serve(listener, app).await.context("Server error")
 }

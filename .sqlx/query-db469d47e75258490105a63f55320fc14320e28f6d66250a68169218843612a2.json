@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO animebytes_torrents (torrent_id, group_id)\n                VALUES ($1, $2)\n                ON CONFLICT (torrent_id) DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "db469d47e75258490105a63f55320fc14320e28f6d66250a68169218843612a2"
+}

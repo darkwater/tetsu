@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE platform_links\n                        SET anidb_id = $1, ann_id = $2\n                        WHERE id = $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "cf478dd9e2d9ea219fc42a149b52059e68cb6cd6f5f4536df1b7dff9b7c501c4"
+}

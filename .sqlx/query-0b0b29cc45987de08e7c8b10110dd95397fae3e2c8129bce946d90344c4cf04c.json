@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO files (fid, aid, eid, gid, size, ed2k, json)\n                    VALUES ($1, $2, $3, $4, $5, $6, $7)\n                    ON CONFLICT (fid) DO UPDATE SET\n                        aid = $2,\n                        eid = $3,\n                        gid = $4,\n                        size = $5,\n                        ed2k = $6,\n                        json = $7",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "0b0b29cc45987de08e7c8b10110dd95397fae3e2c8129bce946d90344c4cf04c"
+}

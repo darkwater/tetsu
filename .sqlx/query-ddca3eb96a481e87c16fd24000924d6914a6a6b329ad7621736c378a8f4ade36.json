@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT f.json as fjson, g.json as gjson FROM files f\n                INNER JOIN groups g ON f.gid = g.gid\n                WHERE f.eid = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "fjson",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "gjson",
+        "ordinal": 1,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "ddca3eb96a481e87c16fd24000924d6914a6a6b329ad7621736c378a8f4ade36"
+}
