@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT a.aid, a.json as ajson, e.eid, e.json as ejson\n         FROM indexed_files if\n         INNER JOIN files f\n            ON if.fid = f.fid\n         INNER JOIN episodes e\n            ON f.eid = e.eid\n         INNER JOIN anime a\n            ON f.aid = a.aid\n         WHERE if.path = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "aid",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "ajson",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "eid",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "ejson",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "cf3e392d7b340b1cb148f83cf3d7e2f5f40056b910df9dca091e3f6fba983666"
+}

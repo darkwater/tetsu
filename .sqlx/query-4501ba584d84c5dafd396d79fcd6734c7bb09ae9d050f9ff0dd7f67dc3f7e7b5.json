@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO watch_progress (aid, last_eid, episode_progress, anime_progress, last_updated)\n         VALUES (?, ?, ?, ?, ?)\n         ON CONFLICT (aid) DO UPDATE SET last_eid = ?, episode_progress = ?, anime_progress = ?, last_updated = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 9
+    },
+    "nullable": []
+  },
+  "hash": "4501ba584d84c5dafd396d79fcd6734c7bb09ae9d050f9ff0dd7f67dc3f7e7b5"
+}
