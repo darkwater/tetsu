@@ -23,6 +23,7 @@ pub async fn run() -> anyhow::Result<()> {
         .route("/anime/:aid/episodes", get(routes::anime_episodes))
         .route("/anime/:aid/files", get(routes::anime_files))
         .route("/mpv", get(routes::mpv::mpv_upgrade))
+        .route("/report-progress", post(routes::report_progress))
         .route("/settings", get(routes::settings::get))
         .route("/settings", post(routes::settings::post))
         .route("/animebytes/search", get(routes::proxy::animebytes::search))

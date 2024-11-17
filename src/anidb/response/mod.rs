@@ -29,7 +29,7 @@ impl FromStr for Response {
         let code = ResponseCode::from_u32(code.parse().context("Invalid response code")?)
             .context("Unknown response code")?;
 
-        let records = lines.map(|line| line.to_string()).collect();
+        let records = lines.map(|line| line.replace('`', "'")).collect();
 
         Ok(Response { code, message, records })
     }
