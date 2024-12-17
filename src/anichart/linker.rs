@@ -36,16 +36,15 @@ pub async fn inner(no_results: &mut HashSet<i32>) -> Result<()> {
 
                 sqlx::query!(
                     "UPDATE platform_links
-                SET anilist_id = $1
-                WHERE mal_id = $2",
+                    SET anilist_id = $1
+                    WHERE mal_id = $2",
                     anilist_id,
                     mal_id,
                 )
                 .execute(crate::DB.get().await)
                 .await?;
             }
-            Err(e) => {
-                dbg!(e);
+            Err(_) => {
                 log::warn!("No results for MAL ID {}", mal_id);
                 no_results.insert(mal_id);
             }
