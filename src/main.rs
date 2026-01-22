@@ -1,32 +1,9 @@
-#![allow(dead_code)] // too much wip for now
+use std::path::PathBuf;
 
-use std::{path::PathBuf, sync::RwLock as StdRwLock};
-
-use anidb::Anidb;
 use anyhow::Result;
-use async_once::AsyncOnce;
 use clap::{Parser, ValueEnum};
 use env_logger::Target;
-use lazy_static::lazy_static;
-use log_proxy::LogProxy;
-use sqlx::SqlitePool;
-use tokio::sync::RwLock;
-
-use crate::config::Config;
-
-mod anichart;
-mod anidb;
-mod animebytes;
-mod config;
-mod db;
-mod gui;
-mod http_server;
-mod indexer;
-mod log_proxy;
-mod mpv;
-mod remote_gui;
-mod server;
-mod ui;
+use tetsu::{log_proxy::LogProxy, *};
 
 #[derive(Parser)]
 #[clap(version, author, about)]
@@ -45,7 +22,18 @@ enum Subcommand {
     Login,
 
     /// Index a directory of anime files
-    Index { path: PathBuf },
+    Index {
+        /// Folder or file to index
+        path: PathBuf,
+
+        /// Write a .m3u8 playlist file
+        #[clap(short, long)]
+        write_playlist: Option<PathBuf>,
+
+        /// Dump AniDB data to a JSON file
+        #[clap(short, long)]
+        json_dump: Option<PathBuf>,
+    },
 
     /// Run the TUI
     #[default]
@@ -58,23 +46,17 @@ enum Subcommand {
     RemoteGui { addr: String },
 }
 
-#[derive(Clone, ValueEnum)]
+#[derive(Clone, Copy, ValueEnum)]
 enum ServerType {
     Tarpc,
     Http,
 }
 
-lazy_static! {
-    static ref ARGS: Args = Args::parse();
-    static ref CONFIG: RwLock<Config> = RwLock::new(Config::read());
-    static ref DB: AsyncOnce<SqlitePool> = AsyncOnce::new(db::init());
-    static ref ANIDB: RwLock<Anidb> = RwLock::new(Anidb::new());
-    static ref PROGRESS_BAR: StdRwLock<Option<indicatif::MultiProgress>> = StdRwLock::new(None);
-}
-
 #[tokio::main]
 async fn main() -> Result<()> {
-    if ARGS.server.is_some() && ARGS.subcommand.is_none() && std::env::var("RUST_LOG").is_err() {
+    let args = Args::parse();
+
+    if args.server.is_some() && args.subcommand.is_none() && std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
     }
 
@@ -82,7 +64,7 @@ async fn main() -> Result<()> {
         .target(Target::Pipe(Box::new(LogProxy)))
         .init();
 
-    let server_handle = ARGS.server.as_ref().map(|stype| {
+    let server_handle = args.server.map(|stype| {
         tokio::spawn(async move {
             anichart::linker::run().await;
         });
@@ -100,13 +82,21 @@ async fn main() -> Result<()> {
         })
     });
 
-    match ARGS.subcommand {
-        None if ARGS.server.is_some() => {}
+    match &args.subcommand {
+        None if args.server.is_some() => {}
         Some(Subcommand::Login) => {
             anidb::login().await?;
         }
-        Some(Subcommand::Index { ref path }) => {
+        Some(Subcommand::Index { path, write_playlist, json_dump }) => {
             indexer::index(path).await?;
+
+            if let Some(playlist) = write_playlist {
+                indexer::playlist::write(path, playlist).await?;
+            }
+
+            if let Some(json_path) = json_dump {
+                indexer::dump::dump_json(path, json_path).await?;
+            }
         }
         None | Some(Subcommand::Tui) => {
             ui::run().await?;
@@ -118,7 +108,7 @@ async fn main() -> Result<()> {
         Some(Subcommand::Gui) => {
             gui::run().unwrap();
         }
-        Some(Subcommand::RemoteGui { ref addr }) => {
+        Some(Subcommand::RemoteGui { addr }) => {
             remote_gui::run(addr).await?;
         }
     }

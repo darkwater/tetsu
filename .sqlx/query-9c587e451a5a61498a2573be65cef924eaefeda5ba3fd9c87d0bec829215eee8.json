@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT fid FROM indexed_files WHERE path = $1",
+  "describe": {
+    "columns": [
+      {
+        "name": "fid",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "9c587e451a5a61498a2573be65cef924eaefeda5ba3fd9c87d0bec829215eee8"
+}

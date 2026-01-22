@@ -61,6 +61,20 @@ impl Anidb {
         self.session().await?.file_by_ed2k(size, hash).await
     }
 
+    pub async fn file_by_fid(&mut self, fid: u32) -> Result<Option<File>> {
+        let cache = sqlx::query!("SELECT json FROM files WHERE fid = $1", fid)
+            .fetch_optional(crate::DB.get().await)
+            .await?;
+
+        if let Some(file) = cache {
+            return Ok(Some(
+                serde_json::from_str(&file.json).context("Invalid record in database")?,
+            ));
+        }
+
+        self.session().await?.file_by_fid(fid).await
+    }
+
     pub async fn anime_by_aid(&mut self, aid: u32) -> Result<Option<Anime>> {
         let cache = sqlx::query!("SELECT json FROM anime WHERE aid = $1", aid)
             .fetch_optional(crate::DB.get().await)

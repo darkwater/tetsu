@@ -10,7 +10,9 @@ use tokio::{fs, sync::mpsc};
 
 use crate::ANIDB;
 
-mod ed2k;
+pub mod dump;
+pub mod ed2k;
+pub mod playlist;
 
 #[derive(Debug)]
 struct AnidbRequestHandoff {

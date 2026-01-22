@@ -140,12 +140,8 @@ impl Session {
         Ok(self.key.as_ref().unwrap())
     }
 
-    pub async fn file_by_ed2k(&mut self, size: i64, hash: &str) -> Result<Option<File>> {
-        let cmd = CommandBuilder::new("FILE")
-            .arg("size", size)
-            .arg("ed2k", hash)
-            .arg("fmask", "71c2fef800")
-            .arg("amask", "00000000");
+    async fn file_inner(&mut self, cmd: CommandBuilder) -> Result<Option<File>> {
+        let cmd = cmd.arg("fmask", "71c2fef800").arg("amask", "00000000");
 
         let res = self.request(cmd).await?;
 
@@ -188,6 +184,20 @@ impl Session {
             }
             v => v,
         }
+    }
+
+    pub async fn file_by_ed2k(&mut self, size: i64, hash: &str) -> Result<Option<File>> {
+        let cmd = CommandBuilder::new("FILE")
+            .arg("size", size)
+            .arg("ed2k", hash);
+
+        self.file_inner(cmd).await
+    }
+
+    pub async fn file_by_fid(&mut self, fid: u32) -> Result<Option<File>> {
+        let cmd = CommandBuilder::new("FILE").arg("fid", fid);
+
+        self.file_inner(cmd).await
     }
 
     pub async fn anime_by_aid(&mut self, aid: u32) -> Result<Option<Anime>> {

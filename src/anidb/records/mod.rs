@@ -4,6 +4,7 @@ use std::{
 };
 
 use anyhow::{bail, Context, Result};
+use chrono::TimeZone;
 
 mod anime;
 mod episode;
@@ -11,7 +12,6 @@ mod file;
 mod group;
 
 pub use anime::Anime;
-use chrono::TimeZone;
 pub use episode::Episode;
 pub use file::File;
 pub use group::Group;

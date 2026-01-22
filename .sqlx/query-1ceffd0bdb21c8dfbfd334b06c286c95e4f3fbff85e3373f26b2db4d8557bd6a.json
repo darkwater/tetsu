@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT json FROM files WHERE fid = $1",
+  "describe": {
+    "columns": [
+      {
+        "name": "json",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "1ceffd0bdb21c8dfbfd334b06c286c95e4f3fbff85e3373f26b2db4d8557bd6a"
+}
